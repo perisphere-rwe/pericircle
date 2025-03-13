@@ -322,7 +322,8 @@ data_dictionary <- function(...){
 
 #' Create a Numeric Variable
 #'
-#' Initializes a `NumericVariable` object, typically used to represent continuous or quantitative data.
+#' Initializes a `NumericVariable` object, typically used to represent
+#'   continuous or quantitative data.
 #'
 #' @param name Character.
 #'   The name of the variable (required).
@@ -335,7 +336,7 @@ data_dictionary <- function(...){
 #' @param dependencies Character vector.
 #'   Names of other variables this variable depends on (optional).
 #' @param units_descriptive Character.
-#'   Human-readable units (e.g., "kg", "years") (optional).
+#'   Variable units (e.g., "kg", "years") (optional).
 #' @param divby_modeling Numeric.
 #'   This constant indicates what the variable's values should be divided by
 #'   before modeling. For example, if age is given in years with `divby_modeling`
