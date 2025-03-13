@@ -1,257 +1,298 @@
 
+# DataVariable ----
+
 DataVariable <- R6::R6Class(
+
   "DataVariable",
 
   public = list(
-    # Public fields
+
+    # relevant for all variables
     name = NULL,
+    type = NULL,
     label = NULL,
     description = NULL,
-    group = NULL,
-    dependencies = NULL,
 
+    # only relevant for nominal variables but should be
+    # set to a value of 'none' for numeric variables
+    category_levels = NULL,
+    category_labels = NULL,
+
+    # only relevant for numeric variables but should be
+    # set to a value of 'none' for nominal variables
+    units = NULL,
+    divby_modeling = NULL,
 
     # Retrievers
-    get_element = function(name){
-      if(is.null(self[[name]])) return(NA)
-      self[[name]]
+    get_element = function(x){
+      if(is.null(self[[x]])) return("none")
+      self[[x]]
     },
 
+    fmt_element = function(x, collapse = ', '){
+      paste(self$get_element(x), collapse = collapse)
+    },
+
+    set_element = function(field, value){
+      self[[field]] <- value
+    },
+
+    set_name = function(value) self$set_element("name", value),
+    set_type = function(value) self$set_element("type", value),
+    set_label = function(value) self$set_element("label", value),
+    set_description = function(value) self$set_element("description", value),
+    set_units = function(value) self$set_element("units", value),
+    set_divby_modeling = function(value) self$set_element("divby_modeling", value),
+    set_category_levels = function(value) self$set_element("category_levels", value),
+    set_category_labels = function(value) self$set_element("category_labels", value),
+
     get_name = function() self$get_element("name"),
+    get_type = function() self$get_element("type"),
     get_label = function() self$get_element("label"),
     get_description = function() self$get_element("description"),
-    get_group = function() self$get_element("group"),
-    get_dependencies = function() self$get_element("dependencies"),
-    get_units_descriptive = function() self$get_element("units_descriptive"),
+    get_units = function() self$get_element("units"),
     get_divby_modeling = function() self$get_element("divby_modeling"),
     get_category_levels = function() self$get_element("category_levels"),
     get_category_labels = function() self$get_element("category_labels"),
 
+    fmt_name = function() self$fmt_element("name"),
+    fmt_type = function() self$fmt_element("type"),
+    fmt_label = function() self$fmt_element("label"),
+    fmt_description = function() self$fmt_element("description"),
+    fmt_units = function() self$fmt_element("units"),
+    fmt_divby_modeling = function() self$fmt_element("divby_modeling"),
+    fmt_category_levels = function() self$fmt_element("category_levels"),
+    fmt_category_labels = function() self$fmt_element("category_labels"),
+
     # Constructor
     initialize = function(name,
+                          type = "Data",
                           label = NULL,
-                          description = NULL,
-                          group = NULL,
-                          dependencies = NULL) {
+                          description = NULL) {
+
       if (missing(name) || !is.character(name) || length(name) != 1) {
-        stop("'name' must be a single character string and is required.")
+        stop("'name' must be a single character string and is required.",
+             call. = FALSE)
       }
-      self$name <- name
-      self$label <- label
+
+      self$name        <- name
+      self$type        <- type
+      self$label       <- label
       self$description <- description
-      self$group <- group
-      self$dependencies <- dependencies
+
+
     },
 
     # Method to print object information
     print = function(...) {
-      cat("Variable:\n")
-      cat("  Name               :",
-          self$name, "\n")
-      cat("  Label              :",
-          ifelse(is.null(self$label), "None", self$label), "\n")
-      cat("  Description        :",
-          ifelse(is.null(self$description), "None", self$description), "\n")
-      cat("  Group              :",
-          ifelse(is.null(self$group), "None", self$group), "\n")
-      cat("  Dependencies       :",
-          ifelse(is.null(self$dependencies),
-                 "None",
-                 paste(self$dependencies, collapse = ", ")), "\n")
+      cat(self$fmt_type(), "Variable:\n")
+      cat("  Name               :", self$fmt_name(),        "\n")
+      cat("  Label              :", self$fmt_label(),       "\n")
+      cat("  Description        :", self$fmt_description(), "\n")
     }
+  ),
+
+  private = list(
+
   )
+
 )
 
+# NumericVariable ----
+
 NumericVariable <- R6::R6Class(
+
   "NumericVariable",
+
   inherit = DataVariable,  # Inherit from DataVariable
 
   public = list(
-    # Additional fields specific to NumericVariable
-    units_descriptive = NULL,
-    divby_modeling = NULL,
 
     # Constructor
     initialize = function(name,
                           label = NULL,
                           description = NULL,
-                          group = NULL,
-                          dependencies = NULL,
-                          units_descriptive = NULL,
+                          units = NULL,
                           divby_modeling = NULL) {
 
       # Call the parent class (DataVariable) initialize
       super$initialize(
         name = name,
+        type = "Numeric",
         label = label,
-        description = description,
-        group = group,
-        dependencies = dependencies
+        description = description
       )
 
-      # Set additional fields
-      self$units_descriptive <- units_descriptive
+      # Set numeric fields
+      self$units          <- units
       self$divby_modeling <- divby_modeling
+
     },
 
     # Overriding print method to include unit information
     print = function(...) {
-      super$print(...)  # Call the parent class print
-      cat("  Units (Descriptive):",
-          ifelse(is.null(self$units_descriptive), "None", self$units_descriptive), "\n")
-      cat("  Units (Modeling)   :",
-          ifelse(is.null(self$divby_modeling) | is.null(self$units_descriptive),
-                 "None",
-                 paste("per", self$divby_modeling, self$units_descriptive)), "\n")
+      super$print(...)          # Call the parent class print
+      cat("  Units              :", self$fmt_units(), "\n")
+      cat("  Modeling Divisor   :", self$fmt_divby_modeling(), "\n")
     }
   )
 )
 
+# NominalVariable ----
 
 NominalVariable <- R6::R6Class(
   "NominalVariable",
   inherit = DataVariable,  # Inherit from DataVariable
 
   public = list(
-    # Additional fields specific to NominalVariable
-    category_levels = NULL,
-    category_labels = NULL,
 
     # Constructor
     initialize = function(name,
                           label = NULL,
                           description = NULL,
-                          group = NULL,
-                          dependencies = NULL,
                           category_levels = NULL,
                           category_labels = NULL) {
 
       # Call parent class initialize
       super$initialize(
         name = name,
+        type = "Nominal",
         label = label,
-        description = description,
-        group = group,
-        dependencies = dependencies
+        description = description
       )
 
       # Ensure category_levels are provided and are unique
       if (!is.null(category_levels)) {
+
         if (any(duplicated(category_levels))) {
-          stop("'category_levels' must be unique. Duplicated values found.")
+          stop("'category_levels' must be unique", call. = FALSE)
         }
+
         self$category_levels <- category_levels
+
       }
 
       # If category_labels are not provided, default them to category_levels
       if (is.null(category_labels) && !is.null(category_levels)) {
+
         self$category_labels <- as.character(category_levels)
+
       } else if (!is.null(category_labels)) {
+
         # If both provided, ensure lengths match
         if (length(category_labels) != length(category_levels)) {
-          stop("'category_labels' must be the same length as 'category_levels'.")
+
+          stop("'category_labels' must be the",
+               "same length as 'category_levels'.",
+               call. = FALSE)
+
         }
+
         self$category_labels <- category_labels
+
       }
 
-      # Set additional fields
+      # Set nominal fields
       self$category_levels <- category_levels
       self$category_labels <- category_labels
 
-      # Validate that levels and labels (if both provided) are of same length
-      if (!is.null(self$category_levels) && !is.null(self$category_labels)) {
-        if (length(self$category_levels) != length(self$category_labels)) {
-          stop("'category_levels' and 'category_labels' must be of the same length.")
-        }
-      }
+
     },
 
     # Overriding print method to include category information
     print = function(...) {
+
       super$print(...)  # Call the parent class print
 
-      # Print category levels and labels nicely
-      if (!is.null(self$category_levels)) {
-        cat("  Category Levels    :", paste(self$category_levels, collapse = ", "), "\n")
-      } else {
-        cat("  Category Levels    : None\n")
-      }
+      cat("  Category Levels    :", self$fmt_category_levels(), "\n")
+      cat("  Category Labels    :", self$fmt_category_labels(), "\n")
 
-      if (!is.null(self$category_labels)) {
-        cat("  Category Labels    :", paste(self$category_labels, collapse = ", "), "\n")
-      } else {
-        cat("  Category Labels    : None\n")
-      }
     }
   )
 )
 
+# DataDictionary ----
+
 DataDictionary <- R6::R6Class(
+
   "DataDictionary",
 
   public = list(
-    # Store variables
+
+    # list of numeric and/or nominal variables
     variables = NULL,
-    # Store tibble summary
+
+    # data frame summary
     dictionary = NULL,
 
     # Constructor
-    initialize = function(...) {
-      # Capture all input objects
-      vars <- list(...)
+    initialize = function(vars) {
 
       # Validate that all are instances of DataVariable or its children
       if (length(vars) == 0) {
-        stop("At least one variable must be provided to create a DataDictionary.")
+        stop("At least one variable must be provided ",
+             "to create a DataDictionary.", call. = FALSE)
       }
+
       if (!all(purrr::map_lgl(vars, ~ inherits(.x, "DataVariable")))) {
-        stop("All inputs must inherit from 'DataVariable' (e.g., NumericVariable, NominalVariable).")
+        stop("All inputs must inherit from 'DataVariable' ",
+             "(e.g., NumericVariable, NominalVariable).", call. = FALSE)
       }
+
+      var_names <- purrr::map_chr(vars, ~.x$name)
 
       # Store variables list
-      self$variables <- vars
+      self$variables <- purrr::set_names(vars, var_names)
 
       # Extract data for the tibble
-      self$dictionary <- self$create_dictionary_tibble(vars)
+      self$dictionary <- self$create_dictionary(vars)
+
     },
 
     # Function to create tibble summary of variables
-    create_dictionary_tibble = function(vars) {
+    create_dictionary = function(vars) {
 
       tibble::tibble(
-
-        name = purrr::map_chr(vars, ~ .x$get_name()),
-
-        label = purrr::map_chr(vars, ~ .x$get_label()),
-
-        description = purrr::map_chr(vars, ~ .x$get_description()),
-
-        group = purrr::map_chr(vars, ~ .x$get_group()),
-
-        dependencies = purrr::map_chr(vars, ~ {
-          stringr::str_c(.x$get_dependencies(), collapse = ', ')
-        }),
-
-        units_descriptive = purrr::map_chr(vars, ~ .x$get_units_descriptive()),
-
-        divby_modeling = purrr::map_dbl(vars, ~ .x$get_divby_modeling()),
-
-        category_levels = purrr::map_chr(vars, ~ {
-          stringr::str_c(.x$get_category_levels(), collapse = ', ')
-        }),
-
-        category_labels = purrr::map_chr(vars, ~ {
-          stringr::str_c(.x$get_category_levels(), collapse = ', ')
-        })
+        name            = purrr::map_chr(vars, ~ .x$fmt_name()),
+        label           = purrr::map_chr(vars, ~ .x$fmt_label()),
+        description     = purrr::map_chr(vars, ~ .x$fmt_description()),
+        units           = purrr::map_chr(vars, ~ .x$fmt_units()),
+        divby_modeling  = purrr::map_chr(vars, ~ .x$fmt_divby_modeling()),
+        category_levels = purrr::map_chr(vars, ~ .x$fmt_category_levels()),
+        category_labels = purrr::map_chr(vars, ~ .x$fmt_category_levels())
       )
+
+    },
+
+    modify_dictionary = function(..., field){
+
+      .dots <- list(...)
+
+      browser()
+
+      for(i in names(.dots)){
+        self$variables[[i]]$set_element(field = field, value = .dots[[i]])
+      }
+
+      # Extract data for the tibble
+      self$dictionary <- self$create_dictionary(self$variables)
+
     },
 
     # Print method
     print = function(...) {
+
       cat("Data Dictionary:\n")
       print(self$dictionary, n = Inf)
+
     }
+  ),
+
+  private = list(
+
+
   )
+
 )
 
 
@@ -284,7 +325,7 @@ as_tibble.DataDictionary <- function(x, ...){
 }
 
 
-#' Create a Data Dictionary
+#' Create Data Dictionary from Variable Definitions
 #'
 #' Initializes a `DataDictionary` object from a set of variables.
 #' Variables should be made using `numeric_variable()` or `nominal_variable()`
@@ -303,7 +344,7 @@ as_tibble.DataDictionary <- function(x, ...){
 #' age_years <- numeric_variable(
 #'   name = "age",
 #'   label = "Age of participant",
-#'   units_descriptive = "years"
+#'   units = "years"
 #' )
 #'
 #' gender <- nominal_variable(
@@ -317,7 +358,43 @@ as_tibble.DataDictionary <- function(x, ...){
 #' print(dict)
 #'
 data_dictionary <- function(...){
-  DataDictionary$new(...)
+
+  DataDictionary$new(list(...))
+
+}
+
+
+#' Create Data Dictionary from Existing Data
+#'
+#' @param x a data frame
+#'
+#' @return a `DataDictionary`
+#'
+#' @export
+#'
+#' @examples
+#'
+as_data_dictionary <- function(x){
+
+  stopifnot(is.data.frame(x))
+
+  vars <- purrr::map2(
+    .x = x,
+    .y = names(x),
+    .f = ~ switch(
+      class(.x)[1],
+      'factor' = NominalVariable$new(name = .y, label = attr(.x, 'label')),
+      'character' = NominalVariable$new(name = .y, label = attr(.x, 'label')),
+      'numeric' = NumericVariable$new(name = .y, label = attr(.x, 'label')),
+      'integer' = NumericVariable$new(name = .y, label = attr(.x, 'label')),
+      NULL
+    )
+  )
+
+  keep <- which(purrr::map_lgl(vars, ~!is.null(.x)))
+
+  DataDictionary$new(vars[keep])
+
 }
 
 #' Create a Numeric Variable
@@ -333,9 +410,7 @@ data_dictionary <- function(...){
 #'   A longer description of the variable (optional).
 #' @param group Character.
 #'   The group or domain this variable belongs to (optional).
-#' @param dependencies Character vector.
-#'   Names of other variables this variable depends on (optional).
-#' @param units_descriptive Character.
+#' @param units Character.
 #'   Variable units (e.g., "kg", "years") (optional).
 #' @param divby_modeling Numeric.
 #'   This constant indicates what the variable's values should be divided by
@@ -351,7 +426,7 @@ data_dictionary <- function(...){
 #' age <- numeric_variable(
 #'   name = "age",
 #'   label = "Age of participant",
-#'   units_descriptive = "years",
+#'   units = "years",
 #'   divby_modeling = 10
 #' )
 #' print(age)
@@ -360,16 +435,14 @@ numeric_variable <- function(name,
                              label = NULL,
                              description = NULL,
                              group = NULL,
-                             dependencies = NULL,
-                             units_descriptive = NULL,
+                             units = NULL,
                              divby_modeling = NULL){
 
   NumericVariable$new(name = name,
                       label = label,
                       description = description,
                       group = group,
-                      dependencies = dependencies,
-                      units_descriptive = units_descriptive,
+                      units = units,
                       divby_modeling = divby_modeling)
 
 }
@@ -386,8 +459,6 @@ numeric_variable <- function(name,
 #'   A longer description of the variable (optional).
 #' @param group Character.
 #'   The group or domain this variable belongs to (optional).
-#' @param dependencies Character vector.
-#'   Names of other variables this variable depends on (optional).
 #' @param category_levels Character vector.
 #'   The set of unique category codes.
 #' @param category_labels Character vector.
@@ -410,7 +481,6 @@ nominal_variable <- function(name,
                              label = NULL,
                              description = NULL,
                              group = NULL,
-                             dependencies = NULL,
                              category_levels = NULL,
                              category_labels = NULL){
 
@@ -418,7 +488,6 @@ nominal_variable <- function(name,
                       label = label,
                       description = description,
                       group = group,
-                      dependencies = dependencies,
                       category_levels = category_levels,
                       category_labels = category_labels)
 
