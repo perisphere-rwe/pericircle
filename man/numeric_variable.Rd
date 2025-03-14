@@ -9,8 +9,7 @@ numeric_variable(
   label = NULL,
   description = NULL,
   group = NULL,
-  dependencies = NULL,
-  units_descriptive = NULL,
+  units = NULL,
   divby_modeling = NULL
 )
 }
@@ -27,11 +26,8 @@ A longer description of the variable (optional).}
 \item{group}{Character.
 The group or domain this variable belongs to (optional).}
 
-\item{dependencies}{Character vector.
-Names of other variables this variable depends on (optional).}
-
-\item{units_descriptive}{Character.
-Human-readable units (e.g., "kg", "years") (optional).}
+\item{units}{Character.
+Variable units (e.g., "kg", "years") (optional).}
 
 \item{divby_modeling}{Numeric.
 This constant indicates what the variable's values should be divided by
@@ -44,13 +40,14 @@ coefficient for age, will be expected change per 10 years (optional).}
 A \code{NumericVariable} object.
 }
 \description{
-Initializes a \code{NumericVariable} object, typically used to represent continuous or quantitative data.
+Initializes a \code{NumericVariable} object, typically used to represent
+continuous or quantitative data.
 }
 \examples{
 age <- numeric_variable(
   name = "age",
   label = "Age of participant",
-  units_descriptive = "years",
+  units = "years",
   divby_modeling = 10
 )
 print(age)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/DataVariable.R
 \name{data_dictionary}
 \alias{data_dictionary}
-\title{Create a Data Dictionary}
+\title{Create Data Dictionary from Variable Definitions}
 \usage{
 data_dictionary(...)
 }
@@ -24,7 +24,7 @@ and passed directly as arguments.
 age_years <- numeric_variable(
   name = "age",
   label = "Age of participant",
-  units_descriptive = "years"
+  units = "years"
 )
 
 gender <- nominal_variable(

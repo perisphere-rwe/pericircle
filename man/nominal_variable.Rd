@@ -9,7 +9,6 @@ nominal_variable(
   label = NULL,
   description = NULL,
   group = NULL,
-  dependencies = NULL,
   category_levels = NULL,
   category_labels = NULL
 )
@@ -26,9 +25,6 @@ A longer description of the variable (optional).}
 
 \item{group}{Character.
 The group or domain this variable belongs to (optional).}
-
-\item{dependencies}{Character vector.
-Names of other variables this variable depends on (optional).}
 
 \item{category_levels}{Character vector.
 The set of unique category codes.}

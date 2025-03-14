@@ -23,6 +23,49 @@ DataVariable <- R6::R6Class(
     units = NULL,
     divby_modeling = NULL,
 
+    # Checkers
+
+    check_input = function(field, value){
+      switch(field,
+             "name"            = self$check_name(value),
+             "type"            = self$check_type(value),
+             "label"           = self$check_label(value),
+             "description"     = self$check_description(value),
+             "units"           = self$check_units(value),
+             "divby_modeling"  = self$check_divby_modeling(value),
+             "category_levels" = self$check_category_levels(value),
+             "category_labels" = self$check_category_labels(value))
+    },
+
+    check_name = function(value) {
+      name <- value
+      checkmate::assert_character(name, len = 1, any.missing = FALSE)
+    },
+
+    check_type = function(value) {
+      type <- value
+      checkmate::assert_character(type, len = 1, any.missing = FALSE)
+      checkmate::assert_choice(type, choices = c("Data",
+                                                 "Numeric",
+                                                 "Nominal"))
+    },
+
+    check_label = function(value) {
+      label <- value
+      checkmate::assert_character(label,
+                                  len = 1,
+                                  any.missing = FALSE,
+                                  null.ok = TRUE)
+    },
+
+    check_description = function(value) {
+      description <- value
+      checkmate::assert_character(description,
+                                  len = 1,
+                                  any.missing = FALSE,
+                                  null.ok = TRUE)
+    },
+
     # Retrievers
     get_element = function(x){
       if(is.null(self[[x]])) return("none")
@@ -34,6 +77,7 @@ DataVariable <- R6::R6Class(
     },
 
     set_element = function(field, value){
+      self$check_input(field, value)
       self[[field]] <- value
     },
 
@@ -75,6 +119,12 @@ DataVariable <- R6::R6Class(
              call. = FALSE)
       }
 
+
+      self$check_name(name)
+      self$check_type(type)
+      self$check_label(label)
+      self$check_description(description)
+
       self$name        <- name
       self$type        <- type
       self$label       <- label
@@ -90,10 +140,6 @@ DataVariable <- R6::R6Class(
       cat("  Label              :", self$fmt_label(),       "\n")
       cat("  Description        :", self$fmt_description(), "\n")
     }
-  ),
-
-  private = list(
-
   )
 
 )
@@ -107,6 +153,36 @@ NumericVariable <- R6::R6Class(
   inherit = DataVariable,  # Inherit from DataVariable
 
   public = list(
+
+    check_category_levels = function(value) {
+      if(!is.null(value)) stop(
+        "category levels cannot be specified for a numeric variable",
+        call. = FALSE
+      )
+    },
+
+    check_category_labels = function(value) {
+      if(!is.null(value)) stop(
+        "category labels cannot be specified for a numeric variable",
+        call. = FALSE
+      )
+    },
+
+    check_units = function(value) {
+      units <- value
+      checkmate::assert_character(units,
+                                  len = 1,
+                                  any.missing = FALSE,
+                                  null.ok = TRUE)
+    },
+
+    check_divby_modeling = function(value) {
+      divby_modeling <- value
+      checkmate::assert_numeric(divby_modeling,
+                                len = 1,
+                                any.missing = FALSE,
+                                null.ok = TRUE)
+    },
 
     # Constructor
     initialize = function(name,
@@ -122,6 +198,9 @@ NumericVariable <- R6::R6Class(
         label = label,
         description = description
       )
+
+      self$check_units(units)
+      self$check_divby_modeling(divby_modeling)
 
       # Set numeric fields
       self$units          <- units
@@ -146,6 +225,34 @@ NominalVariable <- R6::R6Class(
 
   public = list(
 
+    check_category_levels = function(value) {
+      category_levels <- value
+      checkmate::assert_character(category_levels,
+                                  any.missing = FALSE,
+                                  null.ok = TRUE)
+    },
+
+    check_category_labels = function(value) {
+      category_labels <- value
+      checkmate::assert_character(category_labels,
+                                  any.missing = FALSE,
+                                  null.ok = TRUE)
+    },
+
+    check_units = function(value) {
+      if(!is.null(value)) stop(
+        "units cannot be specified for a nominal variable",
+        call. = FALSE
+      )
+    },
+
+    check_divby_modeling = function(value) {
+      if(!is.null(value)) stop(
+        "divby_modeling cannot be specified for a nominal variable",
+        call. = FALSE
+      )
+    },
+
     # Constructor
     initialize = function(name,
                           label = NULL,
@@ -161,41 +268,11 @@ NominalVariable <- R6::R6Class(
         description = description
       )
 
-      # Ensure category_levels are provided and are unique
-      if (!is.null(category_levels)) {
+      self$check_category_levels(category_levels)
+      self$check_category_labels(category_labels)
 
-        if (any(duplicated(category_levels))) {
-          stop("'category_levels' must be unique", call. = FALSE)
-        }
-
-        self$category_levels <- category_levels
-
-      }
-
-      # If category_labels are not provided, default them to category_levels
-      if (is.null(category_labels) && !is.null(category_levels)) {
-
-        self$category_labels <- as.character(category_levels)
-
-      } else if (!is.null(category_labels)) {
-
-        # If both provided, ensure lengths match
-        if (length(category_labels) != length(category_levels)) {
-
-          stop("'category_labels' must be the",
-               "same length as 'category_levels'.",
-               call. = FALSE)
-
-        }
-
-        self$category_labels <- category_labels
-
-      }
-
-      # Set nominal fields
       self$category_levels <- category_levels
-      self$category_labels <- category_labels
-
+      self$category_labels <- category_labels %||% category_levels
 
     },
 
@@ -264,14 +341,29 @@ DataDictionary <- R6::R6Class(
 
     },
 
-    modify_dictionary = function(..., field){
+    modify_dictionary = function(key, field){
 
-      .dots <- list(...)
+      chk_inputs <-
+        checkmate::check_character(names(key),
+                                   any.missing = FALSE,
+                                   unique = TRUE,
+                                   null.ok = FALSE)
 
-      browser()
+      throw_check(chk_inputs)
 
-      for(i in names(.dots)){
-        self$variables[[i]]$set_element(field = field, value = .dots[[i]])
+      for(i in seq_along(names(key))){
+
+        chk_i <- checkmate::check_choice(
+          x = names(key)[i],
+          choices = self$dictionary$name
+        )
+
+        throw_check(chk_i, pre_text = "Input name not recognized. ")
+
+      }
+
+      for(i in names(key)){
+        self$variables[[i]]$set_element(field = field, value = key[[i]])
       }
 
       # Extract data for the tibble
@@ -286,44 +378,9 @@ DataDictionary <- R6::R6Class(
       print(self$dictionary, n = Inf)
 
     }
-  ),
-
-  private = list(
-
-
   )
 
 )
-
-
-#' Coerce data dictionary to data frame
-#'
-#' @param x a `DataDictionary` object
-#' @param ...
-#'
-#' @return a `tibble`
-#' @export
-#'
-#' @examples
-#'
-#' age_years <- NumericVariable$new(
-#'   name = "age",
-#'   label = "Age of participant"
-#' )
-#'
-#' age_group <- NominalVariable$new(
-#'   name = "age_group",
-#'   label = "Age group",
-#'   category_levels = c("age_lt_50", "age_gteq_50_lt_60", "age_gteq_60"),
-#'   category_labels = c("0 to < 50", "50 to < 60", "\u2265 60")
-#' )
-#'
-#' data_dictionary(age_years, age_group)
-
-as_tibble.DataDictionary <- function(x, ...){
-  x$dictionary
-}
-
 
 #' Create Data Dictionary from Variable Definitions
 #'
