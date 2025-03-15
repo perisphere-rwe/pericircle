@@ -2,13 +2,32 @@
 % Please edit documentation in R/get.R
 \name{get_unknowns}
 \alias{get_unknowns}
-\title{Title}
+\title{Get Unknown Fields in Dictionary}
 \usage{
 get_unknowns(x, as_request = FALSE)
 }
 \arguments{
-\item{as_request}{}
+\item{x}{A \link[=data_dictionary]{data dictionary} object.}
+
+\item{as_request}{logical. If \code{TRUE}, text is returned in a readable
+format that can be pasted into other settings, e.g., an e-mail
+requesting for the unknown information. If \code{FALSE} (the default),
+unknowns are returned as a \code{tibble}.}
+}
+\value{
+If \code{as_request = FALSE}, a \link[tibble:tibble-package]{tibble}.
+If \code{as_request = TRUE}, text is returned describing the unknowns.
 }
 \description{
-Title
+Get Unknown Fields in Dictionary
+}
+\examples{
+
+# units isn't returned in the output because it is specified (known)
+get_unknowns(data_dictionary(numeric_variable("a", units = 'years')))
+
+# label isn't returned in the output because it is specified (known)
+get_unknowns(data_dictionary(nominal_variable("b", label = 'example')))
+
+
 }

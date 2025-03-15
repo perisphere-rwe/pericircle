@@ -2,16 +2,14 @@
 % Please edit documentation in R/set.R
 \name{set_label}
 \alias{set_label}
-\alias{set_units}
 \alias{set_description}
+\alias{set_units}
 \alias{set_divby_modeling}
 \alias{set_category_levels}
 \alias{set_category_labels}
-\title{Title}
+\title{Modify Data Dictionary Elements}
 \usage{
 set_label(x, ...)
-
-set_units(x, ...)
 
 set_description(x, ...)
 
@@ -24,8 +22,30 @@ set_category_levels(x, ...)
 set_category_labels(x, ...)
 }
 \arguments{
-\item{...}{}
+\item{x}{A \link[=data_dictionary]{data dictionary} object.}
+
+\item{...}{Name-value pairs. The name gives the name of the variable
+that will be modified. The value must be a:
+\itemize{
+\item character value for \code{set_label()}, \code{set_units()}, and \code{set_description()}
+\item numeric value for \code{set_divby_modeling()}
+\item character vector for \code{set_category_levels()} and \code{set_category_labels()}
+}}
+}
+\value{
+a modified \code{x}
 }
 \description{
-Title
+Modify Data Dictionary Elements
+}
+\examples{
+
+dd <- as_data_dictionary(data.frame(a = 1, b = "cat")) \%>\%
+ set_label(a = "example", b = "categorical example") \%>\%
+ set_units(a = "years") \%>\%
+ set_description(a = "A variable used for examples") \%>\%
+ set_category_labels(b = "A small lion")
+
+dd
+
 }

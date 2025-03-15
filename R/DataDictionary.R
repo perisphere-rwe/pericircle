@@ -1,7 +1,7 @@
 
 # DataVariable ----
 
-DataVariable <- R6::R6Class(
+DataVariable <- R6Class(
 
   "DataVariable",
 
@@ -73,7 +73,7 @@ DataVariable <- R6::R6Class(
     },
 
     fmt_element = function(x, collapse = ', '){
-      paste(self$get_element(x), collapse = collapse)
+      as.character(paste(self$get_element(x), collapse = collapse))
     },
 
     set_element = function(field, value){
@@ -146,7 +146,7 @@ DataVariable <- R6::R6Class(
 
 # NumericVariable ----
 
-NumericVariable <- R6::R6Class(
+NumericVariable <- R6Class(
 
   "NumericVariable",
 
@@ -219,7 +219,7 @@ NumericVariable <- R6::R6Class(
 
 # NominalVariable ----
 
-NominalVariable <- R6::R6Class(
+NominalVariable <- R6Class(
   "NominalVariable",
   inherit = DataVariable,  # Inherit from DataVariable
 
@@ -272,7 +272,7 @@ NominalVariable <- R6::R6Class(
       self$check_category_labels(category_labels)
 
       self$category_levels <- category_levels
-      self$category_labels <- category_labels %||% category_levels
+      self$category_labels <- category_labels
 
     },
 
@@ -290,7 +290,7 @@ NominalVariable <- R6::R6Class(
 
 # DataDictionary ----
 
-DataDictionary <- R6::R6Class(
+DataDictionary <- R6Class(
 
   "DataDictionary",
 
@@ -336,7 +336,7 @@ DataDictionary <- R6::R6Class(
         units           = purrr::map_chr(vars, ~ .x$fmt_units()),
         divby_modeling  = purrr::map_chr(vars, ~ .x$fmt_divby_modeling()),
         category_levels = purrr::map_chr(vars, ~ .x$fmt_category_levels()),
-        category_labels = purrr::map_chr(vars, ~ .x$fmt_category_levels())
+        category_labels = purrr::map_chr(vars, ~ .x$fmt_category_labels())
       )
 
     },
@@ -385,11 +385,11 @@ DataDictionary <- R6::R6Class(
 #' Create Data Dictionary from Variable Definitions
 #'
 #' Initializes a `DataDictionary` object from a set of variables.
-#' Variables should be made using `numeric_variable()` or `nominal_variable()`
+#' Variables should be made using [numeric_variable()] or [nominal_variable()]
 #' and passed directly as arguments.
 #'
-#' @param ... One or more objects inheriting from `NumericVariable`
-#'   or `NominalVariable`.
+#' @param ... One or more objects inheriting from `r roxy_describe_numeric()`
+#'   or `r roxy_describe_nominal()`.
 #'
 #' @return A `DataDictionary` object containing a tibble summary of all
 #'   variables.
@@ -411,8 +411,8 @@ DataDictionary <- R6::R6Class(
 #'   category_labels = c("Male", "Female")
 #' )
 #'
-#' dict <- data_dictionary(age_years, gender)
-#' print(dict)
+#' dd <- data_dictionary(age_years, gender)
+#' print(dd)
 #'
 data_dictionary <- function(...){
 
@@ -425,11 +425,15 @@ data_dictionary <- function(...){
 #'
 #' @param x a data frame
 #'
-#' @return a `DataDictionary`
+#' @return `r roxy_describe_dd()`
 #'
 #' @export
 #'
 #' @examples
+#'
+#' attr(iris$Species, 'label') <- "Flower species"
+#'
+#' as_data_dictionary(iris)
 #'
 as_data_dictionary <- function(x){
 
@@ -440,10 +444,16 @@ as_data_dictionary <- function(x){
     .y = names(x),
     .f = ~ switch(
       class(.x)[1],
-      'factor' = NominalVariable$new(name = .y, label = attr(.x, 'label')),
-      'character' = NominalVariable$new(name = .y, label = attr(.x, 'label')),
-      'numeric' = NumericVariable$new(name = .y, label = attr(.x, 'label')),
-      'integer' = NumericVariable$new(name = .y, label = attr(.x, 'label')),
+      'factor' = NominalVariable$new(name = .y,
+                                     label = attr(.x, 'label'),
+                                     category_levels = levels(.x)),
+      'character' = NominalVariable$new(name = .y,
+                                        label = attr(.x, 'label'),
+                                        category_levels = unique(.x)),
+      'numeric' = NumericVariable$new(name = .y,
+                                      label = attr(.x, 'label')),
+      'integer' = NumericVariable$new(name = .y,
+                                      label = attr(.x, 'label')),
       NULL
     )
   )
@@ -453,6 +463,8 @@ as_data_dictionary <- function(x){
   DataDictionary$new(vars[keep])
 
 }
+
+# Variable functions ----
 
 #' Create a Numeric Variable
 #'
@@ -465,8 +477,6 @@ as_data_dictionary <- function(x){
 #'   A short label for the variable (optional).
 #' @param description Character.
 #'   A longer description of the variable (optional).
-#' @param group Character.
-#'   The group or domain this variable belongs to (optional).
 #' @param units Character.
 #'   Variable units (e.g., "kg", "years") (optional).
 #' @param divby_modeling Numeric.
@@ -480,25 +490,36 @@ as_data_dictionary <- function(x){
 #' @export
 #'
 #' @examples
+#'
 #' age <- numeric_variable(
 #'   name = "age",
 #'   label = "Age of participant",
 #'   units = "years",
 #'   divby_modeling = 10
 #' )
-#' print(age)
 #'
+#' age
+#'
+#'
+#' age_group <- nominal_variable(
+#'   name = "age_group",
+#'   label = "Age group",
+#'   description = "Ages of 0 to < 50, 50 to < 60, and \u2265 60 years",
+#'   category_levels = c("age_lt_50", "age_gteq_50_lt_60", "age_gteq_60"),
+#'   category_labels = c("0 to < 50", "50 to < 60", "\u2265 60")
+#' )
+#'
+#' age_group
+
 numeric_variable <- function(name,
                              label = NULL,
                              description = NULL,
-                             group = NULL,
                              units = NULL,
                              divby_modeling = NULL){
 
   NumericVariable$new(name = name,
                       label = label,
                       description = description,
-                      group = group,
                       units = units,
                       divby_modeling = divby_modeling)
 
@@ -514,8 +535,6 @@ numeric_variable <- function(name,
 #'   A short label for the variable (optional).
 #' @param description Character.
 #'   A longer description of the variable (optional).
-#' @param group Character.
-#'   The group or domain this variable belongs to (optional).
 #' @param category_levels Character vector.
 #'   The set of unique category codes.
 #' @param category_labels Character vector.
@@ -537,14 +556,12 @@ numeric_variable <- function(name,
 nominal_variable <- function(name,
                              label = NULL,
                              description = NULL,
-                             group = NULL,
                              category_levels = NULL,
                              category_labels = NULL){
 
   NominalVariable$new(name = name,
                       label = label,
                       description = description,
-                      group = group,
                       category_levels = category_levels,
                       category_labels = category_labels)
 

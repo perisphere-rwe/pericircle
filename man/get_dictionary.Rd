@@ -17,12 +17,12 @@ Get data dictionary as a data frame
 }
 \examples{
 
-age_years <- NumericVariable$new(
+age_years <- numeric_variable(
   name = "age",
   label = "Age of participant"
 )
 
-age_group <- NominalVariable$new(
+age_group <- nominal_variable(
   name = "age_group",
   label = "Age group",
   category_levels = c("age_lt_50", "age_gteq_50_lt_60", "age_gteq_60"),
