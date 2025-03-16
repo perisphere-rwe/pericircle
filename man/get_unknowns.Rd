@@ -28,6 +28,12 @@ get_unknowns(data_dictionary(numeric_variable("a", units = 'years')))
 
 # label isn't returned in the output because it is specified (known)
 get_unknowns(data_dictionary(nominal_variable("b", label = 'example')))
-
-
+# as_request = TRUE returns this information in a shareable format
+as_data_dictionary(iris) \%>\%
+  set_label(Sepal.Length = "Sepal length",
+            Sepal.Width = "Sepal width",
+            Species = "Flower species") \%>\%
+  set_description(Species = "The species are all subtypes of iris") \%>\%
+  set_units(Sepal.Length = "cm") \%>\%
+  get_unknowns(as_request = TRUE)
 }

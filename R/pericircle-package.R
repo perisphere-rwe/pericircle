@@ -6,5 +6,6 @@ utils::globalVariables(names = c("name", "variable", "type"))
 
 ## usethis namespace: start
 #' @importFrom tibble tibble
+#' @importFrom purrr is_empty
 ## usethis namespace: end
 NULL

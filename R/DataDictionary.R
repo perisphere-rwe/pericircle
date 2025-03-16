@@ -184,6 +184,16 @@ NumericVariable <- R6Class(
                                 null.ok = TRUE)
     },
 
+    get_label_and_unit = function(sep = ', '){
+      paste(self$get_label(), self$get_units(), sep = sep)
+    },
+
+    get_label_divby = function(){
+      paste0(self$get_label(), ", per ",
+             self$get_divby_modeling(), " ",
+             self$get_units())
+    },
+
     # Constructor
     initialize = function(name,
                           label = NULL,
@@ -251,6 +261,14 @@ NominalVariable <- R6Class(
         "divby_modeling cannot be specified for a nominal variable",
         call. = FALSE
       )
+    },
+
+    get_label_and_unit = function(sep = ', '){
+      self$get_label()
+    },
+
+    get_label_divby = function(){
+      self$get_label()
     },
 
     # Constructor
@@ -324,6 +342,10 @@ DataDictionary <- R6Class(
       # Extract data for the tibble
       self$dictionary <- self$create_dictionary(vars)
 
+    },
+
+    get_variable_names = function(){
+      names(self$variables)
     },
 
     # Function to create tibble summary of variables
