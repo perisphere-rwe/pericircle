@@ -47,8 +47,22 @@
 
 infuse_dictionary <- function(data,
                               dictionary = NULL,
-                              units = c("none", "descriptive", "model"),
+                              units = "none",
                               warn_undocumented = TRUE){
+
+  checkmate::assert_character(units, null.ok = FALSE, len = 1)
+  checkmate::assert_choice(units, choices = c("none", "descriptive", "model"))
+  checkmate::assert_logical(warn_undocumented)
+  checkmate::assert_data_frame(data)
+
+  dictionary <- dictionary %||% attr(data, 'dictionary')
+
+  if(is.null(dictionary)){
+    stop("Data dictionary was not supplied and was not found",
+         "in data object", call. = FALSE)
+  }
+
+  checkmate::assert_class(dictionary, classes = "DataDictionary")
 
   overlapping_variables <- names(data) %>%
     intersect(dictionary$get_variable_names())
@@ -90,3 +104,5 @@ infuse_dictionary <- function(data,
   data
 
 }
+
+

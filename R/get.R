@@ -111,8 +111,9 @@ get_unknowns <- function(x, as_request = FALSE){
 #' @examples
 #'
 #' age_years <- numeric_variable(
-#'   name = "age",
-#'   label = "Age of participant"
+#'   name = "age_years",
+#'   label = "Age of participant",
+#'   units = 'years'
 #' )
 #'
 #' age_group <- nominal_variable(

@@ -344,8 +344,56 @@ DataDictionary <- R6Class(
 
     },
 
+    get_label = function(name, units = 'none'){
+
+      switch(
+        units,
+        'none'        = self$variables[[name]]$get_label(),
+        'descriptive' = self$variables[[name]]$get_label_and_unit(),
+        'model'       = self$variables[[name]]$get_label_divby()
+      )
+
+    },
+
     get_variable_names = function(){
       names(self$variables)
+    },
+
+    get_variable_recoder = function(name = NULL, units = 'none'){
+
+      checkmate::assert_character(name, null.ok = TRUE)
+
+      .name <- name %||% names(self$variables)
+
+      for(i in seq_along(.name)){
+        checkmate::assert_choice(.name[i],
+                                 .var.name = .name[i],
+                                 choices = names(self$variables))
+      }
+
+      purrr::map_chr(
+        .x = purrr::set_names(.name),
+        .f = ~ self$get_label(.x, units)
+      )
+
+    },
+
+    get_level_recoder = function(name){
+
+      checkmate::assert_character(name, null.ok = FALSE)
+
+      choices <- self$variables %>%
+        map_lgl(~.x$type == "Nominal") %>%
+        which() %>%
+        names()
+
+      checkmate::assert_choice(name, choices = choices)
+
+      purrr::set_names(
+        x = self$variables[[name]]$category_labels,
+        nm = self$variables[[name]]$category_levels
+      )
+
     },
 
     # Function to create tibble summary of variables
