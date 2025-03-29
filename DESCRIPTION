@@ -15,7 +15,8 @@ Imports:
     purrr,
     tidyr,
     R6,
-    tibble
+    tibble,
+    checkmate
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

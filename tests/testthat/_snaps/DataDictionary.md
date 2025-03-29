@@ -28,8 +28,8 @@
 ---
 
     Code
-      as_data_dictionary(data.frame(a = 1, b = "cat")) %>% set_label(a = "example",
-        b = "categorical example") %>% set_units(a = "years") %>% set_description(a = "A variable used for examples") %>%
+      as_data_dictionary(data.frame(a = 1, b = "cat")) %>% set_labels(a = "example",
+        b = "categorical example") %>% set_units(a = "years") %>% set_descriptions(a = "A variable used for examples") %>%
         set_category_labels(b = "A small lion")
     Output
       Data Dictionary:

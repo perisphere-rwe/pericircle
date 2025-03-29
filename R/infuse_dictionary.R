@@ -2,7 +2,7 @@
 
 #' Infuse data with a dictionary
 #'
-#' Quickly transfer variable and category labels into a dataframe. This
+#' Transfer variable and category labels into a dataframe. This
 #'   is useful if you are passing a data frame to a tabulation or plotting
 #'   function that naturally incorporates labeled data.
 #'
@@ -20,6 +20,10 @@
 #'   a warning is thrown whenever 1 or more variables in `data` do not
 #'   have supporting documentation in `dictionary`. If `FALSE`, then
 #'   this information will not be presented in a warning.
+#'
+#' @details
+#' Additional details...
+#'
 #'
 #' @export
 #'
@@ -86,14 +90,24 @@ infuse_dictionary <- function(data,
 
     if(dictionary$variables[[i]]$type == "Nominal"){
 
+      .levels <- dictionary$variables[[i]]$category_levels
+      .labels <- dictionary$variables[[i]]$category_labels
+
       data[[i]] <- factor(data[[i]],
-                          levels = dictionary$variables[[i]]$category_levels,
-                          labels = dictionary$variables[[i]]$category_labels)
+                          levels = .levels,
+                          labels = .labels %||% .levels)
+
+    }
+
+    if(dictionary$variables[[i]]$type == "Numeric"){
+
+      if(units == 'model') data[[i]] %<>%
+          magrittr::divide_by(dictionary$variables[[i]]$divby_modeling %||% 1)
 
     }
 
     attr(data[[i]], 'label') <- switch(
-      units[1],
+      units,
       'none'        = dictionary$variables[[i]]$get_label(),
       'descriptive' = dictionary$variables[[i]]$get_label_and_unit(),
       'model'       = dictionary$variables[[i]]$get_label_divby()

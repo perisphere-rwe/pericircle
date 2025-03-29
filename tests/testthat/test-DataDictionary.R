@@ -96,7 +96,8 @@ test_that(
 
   desc = "get and set", code = {
 
-    expect_equal(age_years$get_category_labels(), 'none')
+    expect_equal(age_years$get_category_labels(), NULL)
+    expect_equal(age_years$fmt_category_labels(), "none")
 
     expect_equal(age_group$get_category_labels(),
                  c("0 to < 50", "50 to < 60", "\u2265 60"))
@@ -123,9 +124,9 @@ test_that(
 
     dd_set_label <- data_test %>%
       as_data_dictionary() %>%
-      set_label(number = "A double value",
-                integer = "An integer value") %>%
-      set_description(factor = "A factor variable with one level") %>%
+      set_labels(number = "A double value",
+                 integer = "An integer value") %>%
+      set_descriptions(factor = "A factor variable with one level") %>%
       set_divby_modeling(number = 10)
 
     # access new values in dictionary
@@ -217,9 +218,9 @@ test_that(
 
       # example code for set functions
       as_data_dictionary(data.frame(a = 1, b = "cat")) %>%
-        set_label(a = "example", b = "categorical example") %>%
+        set_labels(a = "example", b = "categorical example") %>%
         set_units(a = "years") %>%
-        set_description(a = "A variable used for examples") %>%
+        set_descriptions(a = "A variable used for examples") %>%
         set_category_labels(b = "A small lion")
 
     )

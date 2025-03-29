@@ -7,7 +7,7 @@
 infuse_dictionary(
   data,
   dictionary = NULL,
-  units = c("none", "descriptive", "model"),
+  units = "none",
   warn_undocumented = TRUE
 )
 }
@@ -30,9 +30,12 @@ have supporting documentation in \code{dictionary}. If \code{FALSE}, then
 this information will not be presented in a warning.}
 }
 \description{
-Quickly transfer variable and category labels into a dataframe. This
+Transfer variable and category labels into a dataframe. This
 is useful if you are passing a data frame to a tabulation or plotting
 function that naturally incorporates labeled data.
+}
+\details{
+Additional details...
 }
 \examples{
 age_years <- numeric_variable(

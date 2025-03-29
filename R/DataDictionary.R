@@ -68,11 +68,11 @@ DataVariable <- R6Class(
 
     # Retrievers
     get_element = function(x){
-      if(is.null(self[[x]])) return("none")
       self[[x]]
     },
 
     fmt_element = function(x, collapse = ', '){
+      if(is.null(self[[x]])) return("none")
       as.character(paste(self$get_element(x), collapse = collapse))
     },
 
@@ -81,6 +81,7 @@ DataVariable <- R6Class(
       self[[field]] <- value
     },
 
+    # modify in place
     set_name = function(value) self$set_element("name", value),
     set_type = function(value) self$set_element("type", value),
     set_label = function(value) self$set_element("label", value),
@@ -90,6 +91,7 @@ DataVariable <- R6Class(
     set_category_levels = function(value) self$set_element("category_levels", value),
     set_category_labels = function(value) self$set_element("category_labels", value),
 
+    # return the value (can return NULL)
     get_name = function() self$get_element("name"),
     get_type = function() self$get_element("type"),
     get_label = function() self$get_element("label"),
@@ -99,6 +101,32 @@ DataVariable <- R6Class(
     get_category_levels = function() self$get_element("category_levels"),
     get_category_labels = function() self$get_element("category_labels"),
 
+    # return a value, falling back to secondary options if needed
+    fetch_name = function()
+      self$get_name(),
+
+    fetch_type = function()
+      self$get_type(),
+
+    fetch_label = function()
+      self$get_label() %||% self$fetch_name(),
+
+    fetch_description = function()
+      self$get_description() %||% self$fetch_label(),
+
+    fetch_units = function()
+      self$get_units() %||% "unit",
+
+    fetch_divby_modeling = function()
+      self$get_divby_modeling() %||% 1,
+
+    fetch_category_levels = function()
+      self$get_category_levels(),
+
+    fetch_category_labels = function()
+      self$get_category_labels() %||% self$fetch_category_levels(),
+
+    # format value, can return 'none' when value is NULL
     fmt_name = function() self$fmt_element("name"),
     fmt_type = function() self$fmt_element("type"),
     fmt_label = function() self$fmt_element("label"),
@@ -180,18 +208,21 @@ NumericVariable <- R6Class(
       divby_modeling <- value
       checkmate::assert_numeric(divby_modeling,
                                 len = 1,
+                                lower = 1,
                                 any.missing = FALSE,
                                 null.ok = TRUE)
     },
 
     get_label_and_unit = function(sep = ', '){
-      paste(self$get_label(), self$get_units(), sep = sep)
+      paste(self$fetch_label(),
+            self$fetch_units(),
+            sep = sep)
     },
 
     get_label_divby = function(){
-      paste0(self$get_label(), ", per ",
-             self$get_divby_modeling(), " ",
-             self$get_units())
+      paste0(self$fetch_label(), ", per ",
+             self$fetch_divby_modeling(), " ",
+             self$fetch_units())
     },
 
     # Constructor
@@ -264,11 +295,11 @@ NominalVariable <- R6Class(
     },
 
     get_label_and_unit = function(sep = ', '){
-      self$get_label()
+      self$fetch_label()
     },
 
     get_label_divby = function(){
-      self$get_label()
+      self$fetch_label()
     },
 
     # Constructor
@@ -348,9 +379,9 @@ DataDictionary <- R6Class(
 
       switch(
         units,
-        'none'        = self$variables[[name]]$get_label(),
-        'descriptive' = self$variables[[name]]$get_label_and_unit(),
-        'model'       = self$variables[[name]]$get_label_divby()
+        'none'        = self$variables[[name]]$fetch_label(),
+        'descriptive' = self$variables[[name]]$fetch_label_and_unit(),
+        'model'       = self$variables[[name]]$fetch_label_divby()
       )
 
     },
@@ -359,7 +390,9 @@ DataDictionary <- R6Class(
       names(self$variables)
     },
 
-    get_variable_recoder = function(name = NULL, units = 'none'){
+    get_variable_recoder = function(name = NULL,
+                                    units = 'none',
+                                    quiet = FALSE){
 
       checkmate::assert_character(name, null.ok = TRUE)
 
@@ -371,28 +404,113 @@ DataDictionary <- R6Class(
                                  choices = names(self$variables))
       }
 
-      purrr::map_chr(
+      output <- purrr::map(
         .x = purrr::set_names(.name),
         .f = ~ self$get_label(.x, units)
-      )
+      ) %>%
+        purrr::compact()
+
+      unlabeled <- setdiff(.name, names(output))
+
+      if(!is_empty(unlabeled)){
+
+        if(!quiet){
+          warning("Incomplete recode information for {",
+                  paste(unlabeled, collapse = ", "),
+                  "} : labels are missing.",
+                  call. = FALSE)
+        }
+
+      }
+
+      output
 
     },
 
-    get_level_recoder = function(name){
+    get_level_recoder = function(name = NULL, quiet = FALSE){
 
-      checkmate::assert_character(name, null.ok = FALSE)
+      checkmate::assert_character(name, null.ok = TRUE)
 
       choices <- self$variables %>%
         map_lgl(~.x$type == "Nominal") %>%
         which() %>%
         names()
 
-      checkmate::assert_choice(name, choices = choices)
+      name <- name %||% choices
 
-      purrr::set_names(
-        x = self$variables[[name]]$category_labels,
-        nm = self$variables[[name]]$category_levels
-      )
+      output <- character(length = 0L)
+
+      for(i in seq_along(name)){
+
+        checkmate::assert_choice(name[i], choices = choices)
+
+        .labs <- self$variables[[ name[i] ]]$category_labels
+        .lvls <- self$variables[[ name[i] ]]$category_levels
+
+        if(is.null(.labs)){
+
+          if(!quiet){
+            warning("Recode information for variable {", name[i],
+                    "} is incomplete: labels are missing",
+                    call. = FALSE)
+          }
+
+          next
+
+        }
+
+        output %<>% append(
+          values = purrr::set_names(
+            x = self$variables[[ name[i] ]]$category_labels,
+            nm = self$variables[[ name[i] ]]$category_levels
+          )
+        )
+
+      }
+
+      output
+
+    },
+
+    recode = function(x, units = 'none'){
+
+      x_uni <- unique(stats::na.omit(x))
+
+      variable_recoder <- self$get_variable_recoder(quiet = TRUE)
+      level_recoder <- self$get_level_recoder(quiet = TRUE)
+
+      x_is_variable_names <- all(x_uni %in% names(variable_recoder))
+      x_is_variable_levels <- all(x_uni %in% names(level_recoder))
+
+      if(x_is_variable_levels && x_is_variable_names){
+        stop("unique values of x were found to be present in ",
+             "both the variable labels and the category labels ",
+             "for the given dictionary. It is not clear which ",
+             "of these should be used to recode values of x.",
+             call. = FALSE)
+      }
+
+      if(x_is_variable_levels){
+
+        if(any(duplicated(level_recoder))){
+          stop("there are duplicated levels in the data dictionary. ",
+               "This occurs when one or more variables have identical ",
+               "labels, and it prevents `recode()` from identifying ",
+               "which label to attach to the given x values.",
+               call. = FALSE)
+        }
+
+        return(dplyr::recode(x, !!!level_recoder))
+
+      }
+
+      if(x_is_variable_names){
+        return(dplyr::recode(x, !!!variable_recoder))
+      }
+
+      stop("Unique values in x could not be matched with variable labels ",
+           "or variable level labels in the dictionary.",
+           call. = FALSE)
 
     },
 
