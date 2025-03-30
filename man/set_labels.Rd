@@ -7,8 +7,8 @@
 \alias{set_divby_modeling}
 \alias{set_category_levels}
 \alias{set_category_labels}
-\alias{set_factors}
-\alias{set_factor_levels}
+\alias{set_factor_labels}
+\alias{set_factor_order}
 \title{Modify Data Dictionary Elements}
 \usage{
 set_labels(dictionary, ...)
@@ -23,9 +23,9 @@ set_category_levels(dictionary, ...)
 
 set_category_labels(dictionary, ...)
 
-set_factors(dictionary, ..., .relevel = FALSE)
+set_factor_labels(dictionary, ...)
 
-set_factor_levels(dictionary, ...)
+set_factor_order(dictionary, ...)
 }
 \arguments{
 \item{dictionary}{A \link[=data_dictionary]{data dictionary} object.}

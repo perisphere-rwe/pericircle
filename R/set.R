@@ -75,7 +75,75 @@ set_category_labels <- function(dictionary, ...){
 
 #' @rdname set_labels
 #' @export
-set_factors <- function(dictionary, ..., .relevel = FALSE){
+set_factor_labels <- function(dictionary, ...){
+  set_factors(dictionary, ..., .relevel = FALSE)
+}
+
+
+#' @rdname set_labels
+#' @export
+set_factor_order <- function(dictionary, ...){
+
+  checkmate::assert_class(dictionary, "DataDictionary")
+
+  .dots <- list(...)
+
+  for(i in names(.dots)){
+
+    # expects input of the form: name = c(level = label).
+    checkmate::assert_character(i, .var.name = i, null.ok = FALSE)
+
+    # Here, i is the name, so it should match an existing name in dictionary
+    checkmate::assert_choice(i,
+                             .var.name = i,
+                             choices = dictionary$get_variable_names())
+
+    if(!is.null(names(.dots[[i]]))){
+      stop("Vector inputs to `set_factor_levels` must not be named.\n",
+           " - x = c(\"new_first\", \"new_second\") works\n",
+           " - x = c(a = \"new_first\", b = \"new_second\") does not work.\n",
+           "See ?set_factors to re-order levels and modify labels simultaneously",
+           call. = FALSE)
+    }
+
+    # create input lists for eventual call to modify_dictionary
+    inputs <- purrr::set_names(list(as.character(.dots[[i]])), i)
+
+    current_lvls <- dictionary$variables[[i]]$get_category_levels()
+
+    # user inputs must be character valued and match existing
+    # levels in the dictionary for this variable
+    for(j in inputs[[1]]){
+      checkmate::assert_character(j, .var.name = j, null.ok = FALSE)
+      checkmate::assert_choice(j, .var.name = j, choices = current_lvls)
+    }
+
+    unused_lvls <- setdiff(current_lvls, inputs[[1]])
+
+    inputs[[1]] %<>% append(unused_lvls)
+
+    dictionary$modify_dictionary(inputs, field = 'category_levels')
+
+    if(!is.null(dictionary$variables[[i]]$category_labels)){
+
+      current_labs <- dictionary$variables[[i]]$get_category_labels() %>%
+        purrr::set_names(current_lvls)
+
+      input_labs <- inputs
+      input_labs[[1]] <- as.character(current_labs[inputs[[1]]])
+      dictionary$modify_dictionary(input_labs, field = 'category_labels')
+
+    }
+
+  }
+
+  dictionary
+
+}
+
+
+
+set_factors <- function(dictionary, ..., .relevel){
 
   checkmate::assert_class(dictionary, "DataDictionary")
 
@@ -140,68 +208,4 @@ set_factors <- function(dictionary, ..., .relevel = FALSE){
   dictionary
 
 }
-
-#' @rdname set_labels
-#' @export
-set_factor_levels <- function(dictionary, ...){
-
-  checkmate::assert_class(dictionary, "DataDictionary")
-
-  .dots <- list(...)
-
-  for(i in names(.dots)){
-
-    # expects input of the form: name = c(level = label).
-    checkmate::assert_character(i, .var.name = i, null.ok = FALSE)
-
-    # Here, i is the name, so it should match an existing name in dictionary
-    checkmate::assert_choice(i,
-                             .var.name = i,
-                             choices = dictionary$get_variable_names())
-
-    if(!is.null(names(.dots[[i]]))){
-      stop("Vector inputs to `set_factor_levels` must not be named.\n",
-           " - x = c(\"new_first\", \"new_second\") works\n",
-           " - x = c(a = \"new_first\", b = \"new_second\") does not work.\n",
-           "See ?set_factors to re-order levels and modify labels simultaneously",
-           call. = FALSE)
-    }
-
-    # create input lists for eventual call to modify_dictionary
-    inputs <- purrr::set_names(list(as.character(.dots[[i]])), i)
-
-    current_lvls <- dictionary$variables[[i]]$get_category_levels()
-
-    # user inputs must be character valued and match existing
-    # levels in the dictionary for this variable
-    for(j in inputs[[1]]){
-      checkmate::assert_character(j, .var.name = j, null.ok = FALSE)
-      checkmate::assert_choice(j, .var.name = j, choices = current_lvls)
-    }
-
-    unused_lvls <- setdiff(current_lvls, inputs[[1]])
-
-    inputs[[1]] %<>% append(unused_lvls)
-
-    dictionary$modify_dictionary(inputs, field = 'category_levels')
-
-    if(!is.null(dictionary$variables[[i]]$category_labels)){
-
-      current_labs <- dictionary$variables[[i]]$get_category_labels() %>%
-        purrr::set_names(current_lvls)
-
-      input_labs <- inputs
-      input_labs[[1]] <- as.character(current_labs[inputs[[1]]])
-      dictionary$modify_dictionary(input_labs, field = 'category_labels')
-
-    }
-
-  }
-
-  dictionary
-
-}
-
-
-
 

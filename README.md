@@ -131,12 +131,12 @@ dd_peng <- dd_peng %>%
 #### Modifying factors
 
 `set_category_levels()` and `set_category_labels()` are nice when you
-are creating a dictionary, but `set_factors()` and `set_factor_levels()`
-are the functions you want to use when modifying a dictionary. They are
-helpful in three cases:
+are creating a dictionary, but `set_factor_labels()` and
+`set_factor_order()` are the functions you want to use when modifying a
+dictionary.
 
-**Recode factors**: You want to change one or more labels in a factor?
-Use `set_factors()` with `.reorder = FALSE` (the default)
+Modify factor labels, changing one or more labels in an existing
+variable, with `set_factor_labels()`:
 
 ``` r
 
@@ -149,7 +149,7 @@ dd_peng$variables$sex
 #>   Category Labels    : Male, Female
 
 dd_peng <- dd_peng %>% 
-  set_factors(sex = c(female = "F", male = "M"))
+  set_factor_labels(sex = c(female = "F", male = "M"))
 
 dd_peng$variables$sex
 #> Nominal Variable:
@@ -160,13 +160,13 @@ dd_peng$variables$sex
 #>   Category Labels    : M, F
 ```
 
-**Reorder factors** You want to move one or more levels to the front of
-a factor’s levels? Use `set_factor_levels()`:
+Modify factor order, moving one or more levels to the front, with
+`set_factor_order()`:
 
 ``` r
 
 dd_peng <- dd_peng %>% 
-  set_factor_levels(sex = c("female"))
+  set_factor_order(sex = c("female"))
 
 dd_peng$variables$sex
 #> Nominal Variable:
@@ -175,24 +175,6 @@ dd_peng$variables$sex
 #>   Description        : none 
 #>   Category Levels    : female, male 
 #>   Category Labels    : F, M
-```
-
-**Recode and reorder factors**: You want to change both the labels and
-the level order of a factor at the same time? Use `set_factors()` with
-`.reorder = TRUE` (the default)
-
-``` r
-
-dd_peng <- dd_peng %>% 
-  set_factors(sex = c(male = "Men", female = "Women"), .relevel = TRUE)
-
-dd_peng$variables$sex
-#> Nominal Variable:
-#>   Name               : sex 
-#>   Label              : Sex 
-#>   Description        : none 
-#>   Category Levels    : male, female 
-#>   Category Labels    : Men, Women
 ```
 
 ### Apply dictionary information
@@ -214,14 +196,14 @@ data_peng %>%
 #> # A tibble: 344 × 5
 #>    species sex   body_mass_g bill_length_mm bill_depth_mm
 #>    <fct>   <fct>       <int>          <dbl>         <dbl>
-#>  1 Adelie  Men          3750           39.1          18.7
-#>  2 Adelie  Women        3800           39.5          17.4
-#>  3 Adelie  Women        3250           40.3          18  
+#>  1 Adelie  M            3750           39.1          18.7
+#>  2 Adelie  F            3800           39.5          17.4
+#>  3 Adelie  F            3250           40.3          18  
 #>  4 Adelie  <NA>           NA           NA            NA  
-#>  5 Adelie  Women        3450           36.7          19.3
-#>  6 Adelie  Men          3650           39.3          20.6
-#>  7 Adelie  Women        3625           38.9          17.8
-#>  8 Adelie  Men          4675           39.2          19.6
+#>  5 Adelie  F            3450           36.7          19.3
+#>  6 Adelie  M            3650           39.3          20.6
+#>  7 Adelie  F            3625           38.9          17.8
+#>  8 Adelie  M            4675           39.2          19.6
 #>  9 Adelie  <NA>         3475           34.1          18.1
 #> 10 Adelie  <NA>         4250           42            20.2
 #> # ℹ 334 more rows
@@ -276,16 +258,16 @@ data_peng %>%
 #> # A tibble: 688 × 5
 #>    species sex   body_mass_g name        value
 #>    <fct>   <fct>       <int> <chr>       <dbl>
-#>  1 Adelie  Men          3750 Bill length  39.1
-#>  2 Adelie  Men          3750 Bill depth   18.7
-#>  3 Adelie  Women        3800 Bill length  39.5
-#>  4 Adelie  Women        3800 Bill depth   17.4
-#>  5 Adelie  Women        3250 Bill length  40.3
-#>  6 Adelie  Women        3250 Bill depth   18  
+#>  1 Adelie  M            3750 Bill length  39.1
+#>  2 Adelie  M            3750 Bill depth   18.7
+#>  3 Adelie  F            3800 Bill length  39.5
+#>  4 Adelie  F            3800 Bill depth   17.4
+#>  5 Adelie  F            3250 Bill length  40.3
+#>  6 Adelie  F            3250 Bill depth   18  
 #>  7 Adelie  <NA>           NA Bill length  NA  
 #>  8 Adelie  <NA>           NA Bill depth   NA  
-#>  9 Adelie  Women        3450 Bill length  36.7
-#> 10 Adelie  Women        3450 Bill depth   19.3
+#>  9 Adelie  F            3450 Bill length  36.7
+#> 10 Adelie  F            3450 Bill depth   19.3
 #> # ℹ 678 more rows
 ```
 
@@ -311,20 +293,20 @@ data_infused <- data_peng %>%
 tbl_regression(lm(body_mass_g ~ ., data_infused))
 ```
 
-<div id="cybyzvjpzj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#cybyzvjpzj table {
+<div id="llgbobbafg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#llgbobbafg table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-&#10;#cybyzvjpzj thead, #cybyzvjpzj tbody, #cybyzvjpzj tfoot, #cybyzvjpzj tr, #cybyzvjpzj td, #cybyzvjpzj th {
+&#10;#llgbobbafg thead, #llgbobbafg tbody, #llgbobbafg tfoot, #llgbobbafg tr, #llgbobbafg td, #llgbobbafg th {
   border-style: none;
 }
-&#10;#cybyzvjpzj p {
+&#10;#llgbobbafg p {
   margin: 0;
   padding: 0;
 }
-&#10;#cybyzvjpzj .gt_table {
+&#10;#llgbobbafg .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -349,11 +331,11 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-left-width: 2px;
   border-left-color: #D3D3D3;
 }
-&#10;#cybyzvjpzj .gt_caption {
+&#10;#llgbobbafg .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
-&#10;#cybyzvjpzj .gt_title {
+&#10;#llgbobbafg .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -364,7 +346,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-bottom-color: #FFFFFF;
   border-bottom-width: 0;
 }
-&#10;#cybyzvjpzj .gt_subtitle {
+&#10;#llgbobbafg .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -375,7 +357,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-top-color: #FFFFFF;
   border-top-width: 0;
 }
-&#10;#cybyzvjpzj .gt_heading {
+&#10;#llgbobbafg .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -386,12 +368,12 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-right-width: 1px;
   border-right-color: #D3D3D3;
 }
-&#10;#cybyzvjpzj .gt_bottom_border {
+&#10;#llgbobbafg .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
-&#10;#cybyzvjpzj .gt_col_headings {
+&#10;#llgbobbafg .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -405,7 +387,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-right-width: 1px;
   border-right-color: #D3D3D3;
 }
-&#10;#cybyzvjpzj .gt_col_heading {
+&#10;#llgbobbafg .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -424,7 +406,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-right: 5px;
   overflow-x: hidden;
 }
-&#10;#cybyzvjpzj .gt_column_spanner_outer {
+&#10;#llgbobbafg .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -435,13 +417,13 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-left: 4px;
   padding-right: 4px;
 }
-&#10;#cybyzvjpzj .gt_column_spanner_outer:first-child {
+&#10;#llgbobbafg .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
-&#10;#cybyzvjpzj .gt_column_spanner_outer:last-child {
+&#10;#llgbobbafg .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
-&#10;#cybyzvjpzj .gt_column_spanner {
+&#10;#llgbobbafg .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -452,10 +434,10 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   display: inline-block;
   width: 100%;
 }
-&#10;#cybyzvjpzj .gt_spanner_row {
+&#10;#llgbobbafg .gt_spanner_row {
   border-bottom-style: hidden;
 }
-&#10;#cybyzvjpzj .gt_group_heading {
+&#10;#llgbobbafg .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -480,7 +462,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   vertical-align: middle;
   text-align: left;
 }
-&#10;#cybyzvjpzj .gt_empty_group_heading {
+&#10;#llgbobbafg .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -494,13 +476,13 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-bottom-color: #D3D3D3;
   vertical-align: middle;
 }
-&#10;#cybyzvjpzj .gt_from_md > :first-child {
+&#10;#llgbobbafg .gt_from_md > :first-child {
   margin-top: 0;
 }
-&#10;#cybyzvjpzj .gt_from_md > :last-child {
+&#10;#llgbobbafg .gt_from_md > :last-child {
   margin-bottom: 0;
 }
-&#10;#cybyzvjpzj .gt_row {
+&#10;#llgbobbafg .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -518,7 +500,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   vertical-align: middle;
   overflow-x: hidden;
 }
-&#10;#cybyzvjpzj .gt_stub {
+&#10;#llgbobbafg .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -530,7 +512,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-left: 5px;
   padding-right: 5px;
 }
-&#10;#cybyzvjpzj .gt_stub_row_group {
+&#10;#llgbobbafg .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -543,13 +525,13 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-right: 5px;
   vertical-align: top;
 }
-&#10;#cybyzvjpzj .gt_row_group_first td {
+&#10;#llgbobbafg .gt_row_group_first td {
   border-top-width: 2px;
 }
-&#10;#cybyzvjpzj .gt_row_group_first th {
+&#10;#llgbobbafg .gt_row_group_first th {
   border-top-width: 2px;
 }
-&#10;#cybyzvjpzj .gt_summary_row {
+&#10;#llgbobbafg .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -558,14 +540,14 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-left: 5px;
   padding-right: 5px;
 }
-&#10;#cybyzvjpzj .gt_first_summary_row {
+&#10;#llgbobbafg .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
-&#10;#cybyzvjpzj .gt_first_summary_row.thick {
+&#10;#llgbobbafg .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
-&#10;#cybyzvjpzj .gt_last_summary_row {
+&#10;#llgbobbafg .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -574,7 +556,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
-&#10;#cybyzvjpzj .gt_grand_summary_row {
+&#10;#llgbobbafg .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -583,7 +565,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-left: 5px;
   padding-right: 5px;
 }
-&#10;#cybyzvjpzj .gt_first_grand_summary_row {
+&#10;#llgbobbafg .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -592,7 +574,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-top-width: 6px;
   border-top-color: #D3D3D3;
 }
-&#10;#cybyzvjpzj .gt_last_grand_summary_row_top {
+&#10;#llgbobbafg .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -601,10 +583,10 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-bottom-width: 6px;
   border-bottom-color: #D3D3D3;
 }
-&#10;#cybyzvjpzj .gt_striped {
+&#10;#llgbobbafg .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
-&#10;#cybyzvjpzj .gt_table_body {
+&#10;#llgbobbafg .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -612,7 +594,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
-&#10;#cybyzvjpzj .gt_footnotes {
+&#10;#llgbobbafg .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -625,7 +607,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-right-width: 2px;
   border-right-color: #D3D3D3;
 }
-&#10;#cybyzvjpzj .gt_footnote {
+&#10;#llgbobbafg .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -633,7 +615,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-left: 5px;
   padding-right: 5px;
 }
-&#10;#cybyzvjpzj .gt_sourcenotes {
+&#10;#llgbobbafg .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -646,64 +628,64 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-right-width: 2px;
   border-right-color: #D3D3D3;
 }
-&#10;#cybyzvjpzj .gt_sourcenote {
+&#10;#llgbobbafg .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
   padding-left: 5px;
   padding-right: 5px;
 }
-&#10;#cybyzvjpzj .gt_left {
+&#10;#llgbobbafg .gt_left {
   text-align: left;
 }
-&#10;#cybyzvjpzj .gt_center {
+&#10;#llgbobbafg .gt_center {
   text-align: center;
 }
-&#10;#cybyzvjpzj .gt_right {
+&#10;#llgbobbafg .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
-&#10;#cybyzvjpzj .gt_font_normal {
+&#10;#llgbobbafg .gt_font_normal {
   font-weight: normal;
 }
-&#10;#cybyzvjpzj .gt_font_bold {
+&#10;#llgbobbafg .gt_font_bold {
   font-weight: bold;
 }
-&#10;#cybyzvjpzj .gt_font_italic {
+&#10;#llgbobbafg .gt_font_italic {
   font-style: italic;
 }
-&#10;#cybyzvjpzj .gt_super {
+&#10;#llgbobbafg .gt_super {
   font-size: 65%;
 }
-&#10;#cybyzvjpzj .gt_footnote_marks {
+&#10;#llgbobbafg .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
-&#10;#cybyzvjpzj .gt_asterisk {
+&#10;#llgbobbafg .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
-&#10;#cybyzvjpzj .gt_indent_1 {
+&#10;#llgbobbafg .gt_indent_1 {
   text-indent: 5px;
 }
-&#10;#cybyzvjpzj .gt_indent_2 {
+&#10;#llgbobbafg .gt_indent_2 {
   text-indent: 10px;
 }
-&#10;#cybyzvjpzj .gt_indent_3 {
+&#10;#llgbobbafg .gt_indent_3 {
   text-indent: 15px;
 }
-&#10;#cybyzvjpzj .gt_indent_4 {
+&#10;#llgbobbafg .gt_indent_4 {
   text-indent: 20px;
 }
-&#10;#cybyzvjpzj .gt_indent_5 {
+&#10;#llgbobbafg .gt_indent_5 {
   text-indent: 25px;
 }
-&#10;#cybyzvjpzj .katex-display {
+&#10;#llgbobbafg .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
-&#10;#cybyzvjpzj div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+&#10;#llgbobbafg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -737,13 +719,13 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
 <td headers="estimate" class="gt_row gt_center"><br /></td>
 <td headers="conf.low" class="gt_row gt_center"><br /></td>
 <td headers="p.value" class="gt_row gt_center"><br /></td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    Men</td>
+    <tr><td headers="label" class="gt_row gt_left">    F</td>
 <td headers="estimate" class="gt_row gt_center">—</td>
 <td headers="conf.low" class="gt_row gt_center">—</td>
 <td headers="p.value" class="gt_row gt_center"><br /></td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    Women</td>
-<td headers="estimate" class="gt_row gt_center">-437</td>
-<td headers="conf.low" class="gt_row gt_center">-534, -341</td>
+    <tr><td headers="label" class="gt_row gt_left">    M</td>
+<td headers="estimate" class="gt_row gt_center">437</td>
+<td headers="conf.low" class="gt_row gt_center">341, 534</td>
 <td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
     <tr><td headers="label" class="gt_row gt_left">Bill length, per 5 mm</td>
 <td headers="estimate" class="gt_row gt_center">133</td>

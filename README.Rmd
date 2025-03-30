@@ -86,43 +86,32 @@ dd_peng <- dd_peng %>%
 
 #### Modifying factors
 
-`set_category_levels()` and `set_category_labels()` are nice when you are creating a dictionary, but `set_factors()` and `set_factor_levels()` are the functions you want to use when modifying a dictionary. They are helpful in three cases:
+`set_category_levels()` and `set_category_labels()` are nice when you are creating a dictionary, but `set_factor_labels()` and `set_factor_order()` are the functions you want to use when modifying a dictionary. 
 
-**Recode factors**: You want to change one or more labels in a factor? Use `set_factors()` with `.reorder = FALSE` (the default)
+Modify factor labels, changing one or more labels in an existing variable, with `set_factor_labels()`:
 
 ```{r}
 
 dd_peng$variables$sex
 
 dd_peng <- dd_peng %>% 
-  set_factors(sex = c(female = "F", male = "M"))
+  set_factor_labels(sex = c(female = "F", male = "M"))
 
 dd_peng$variables$sex
 
 ```
 
-**Reorder factors** You want to move one or more levels to the front of a factor's levels? Use `set_factor_levels()`:
+Modify factor order, moving one or more levels to the front, with `set_factor_order()`:
 
 ```{r}
 
 dd_peng <- dd_peng %>% 
-  set_factor_levels(sex = c("female"))
+  set_factor_order(sex = c("female"))
 
 dd_peng$variables$sex
 
 ```
 
-
-**Recode and reorder factors**: You want to change both the labels and the level order of a factor at the same time? Use `set_factors()` with `.reorder = TRUE` (the default)
-
-```{r}
-
-dd_peng <- dd_peng %>% 
-  set_factors(sex = c(male = "Men", female = "Women"), .relevel = TRUE)
-
-dd_peng$variables$sex
-
-```
 
 
 ### Apply dictionary information
