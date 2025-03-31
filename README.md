@@ -281,32 +281,36 @@ with the dictionary we created and specify that we want to format
 continuous variables using their modeling units (e.g., bill length is
 modeled per 10 mm). Note that when you infuse data with dictionaries and
 specify `units = 'model'`, the corresponding variables will be divided
-by their designated `divby_model` value.
+by their designated `divby_model` value and new columns will be created.
+If you don’t want new columns, you can specify `divby_suffix = NULL`
+when you infuse.
 
 ``` r
 
 library(gtsummary)
 
 data_infused <- data_peng %>% 
-  infuse_dictionary(dd_peng, units = 'model')
+  infuse_dictionary(dd_peng, units = 'model', divby_suffix = NULL)
 
-tbl_regression(lm(body_mass_g ~ ., data_infused))
+fit <- lm(formula = body_mass_g ~ ., data = data_infused)
+
+tbl_regression(fit)
 ```
 
-<div id="llgbobbafg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#llgbobbafg table {
+<div id="unuimlsgas" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#unuimlsgas table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-&#10;#llgbobbafg thead, #llgbobbafg tbody, #llgbobbafg tfoot, #llgbobbafg tr, #llgbobbafg td, #llgbobbafg th {
+&#10;#unuimlsgas thead, #unuimlsgas tbody, #unuimlsgas tfoot, #unuimlsgas tr, #unuimlsgas td, #unuimlsgas th {
   border-style: none;
 }
-&#10;#llgbobbafg p {
+&#10;#unuimlsgas p {
   margin: 0;
   padding: 0;
 }
-&#10;#llgbobbafg .gt_table {
+&#10;#unuimlsgas .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -331,11 +335,11 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-left-width: 2px;
   border-left-color: #D3D3D3;
 }
-&#10;#llgbobbafg .gt_caption {
+&#10;#unuimlsgas .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
-&#10;#llgbobbafg .gt_title {
+&#10;#unuimlsgas .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -346,7 +350,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-bottom-color: #FFFFFF;
   border-bottom-width: 0;
 }
-&#10;#llgbobbafg .gt_subtitle {
+&#10;#unuimlsgas .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -357,7 +361,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-top-color: #FFFFFF;
   border-top-width: 0;
 }
-&#10;#llgbobbafg .gt_heading {
+&#10;#unuimlsgas .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -368,12 +372,12 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-right-width: 1px;
   border-right-color: #D3D3D3;
 }
-&#10;#llgbobbafg .gt_bottom_border {
+&#10;#unuimlsgas .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
-&#10;#llgbobbafg .gt_col_headings {
+&#10;#unuimlsgas .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -387,7 +391,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-right-width: 1px;
   border-right-color: #D3D3D3;
 }
-&#10;#llgbobbafg .gt_col_heading {
+&#10;#unuimlsgas .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -406,7 +410,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-right: 5px;
   overflow-x: hidden;
 }
-&#10;#llgbobbafg .gt_column_spanner_outer {
+&#10;#unuimlsgas .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -417,13 +421,13 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-left: 4px;
   padding-right: 4px;
 }
-&#10;#llgbobbafg .gt_column_spanner_outer:first-child {
+&#10;#unuimlsgas .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
-&#10;#llgbobbafg .gt_column_spanner_outer:last-child {
+&#10;#unuimlsgas .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
-&#10;#llgbobbafg .gt_column_spanner {
+&#10;#unuimlsgas .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -434,10 +438,10 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   display: inline-block;
   width: 100%;
 }
-&#10;#llgbobbafg .gt_spanner_row {
+&#10;#unuimlsgas .gt_spanner_row {
   border-bottom-style: hidden;
 }
-&#10;#llgbobbafg .gt_group_heading {
+&#10;#unuimlsgas .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -462,7 +466,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   vertical-align: middle;
   text-align: left;
 }
-&#10;#llgbobbafg .gt_empty_group_heading {
+&#10;#unuimlsgas .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -476,13 +480,13 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-bottom-color: #D3D3D3;
   vertical-align: middle;
 }
-&#10;#llgbobbafg .gt_from_md > :first-child {
+&#10;#unuimlsgas .gt_from_md > :first-child {
   margin-top: 0;
 }
-&#10;#llgbobbafg .gt_from_md > :last-child {
+&#10;#unuimlsgas .gt_from_md > :last-child {
   margin-bottom: 0;
 }
-&#10;#llgbobbafg .gt_row {
+&#10;#unuimlsgas .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -500,7 +504,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   vertical-align: middle;
   overflow-x: hidden;
 }
-&#10;#llgbobbafg .gt_stub {
+&#10;#unuimlsgas .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -512,7 +516,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-left: 5px;
   padding-right: 5px;
 }
-&#10;#llgbobbafg .gt_stub_row_group {
+&#10;#unuimlsgas .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -525,13 +529,13 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-right: 5px;
   vertical-align: top;
 }
-&#10;#llgbobbafg .gt_row_group_first td {
+&#10;#unuimlsgas .gt_row_group_first td {
   border-top-width: 2px;
 }
-&#10;#llgbobbafg .gt_row_group_first th {
+&#10;#unuimlsgas .gt_row_group_first th {
   border-top-width: 2px;
 }
-&#10;#llgbobbafg .gt_summary_row {
+&#10;#unuimlsgas .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -540,14 +544,14 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-left: 5px;
   padding-right: 5px;
 }
-&#10;#llgbobbafg .gt_first_summary_row {
+&#10;#unuimlsgas .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
-&#10;#llgbobbafg .gt_first_summary_row.thick {
+&#10;#unuimlsgas .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
-&#10;#llgbobbafg .gt_last_summary_row {
+&#10;#unuimlsgas .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -556,7 +560,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
-&#10;#llgbobbafg .gt_grand_summary_row {
+&#10;#unuimlsgas .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -565,7 +569,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-left: 5px;
   padding-right: 5px;
 }
-&#10;#llgbobbafg .gt_first_grand_summary_row {
+&#10;#unuimlsgas .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -574,7 +578,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-top-width: 6px;
   border-top-color: #D3D3D3;
 }
-&#10;#llgbobbafg .gt_last_grand_summary_row_top {
+&#10;#unuimlsgas .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -583,10 +587,10 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-bottom-width: 6px;
   border-bottom-color: #D3D3D3;
 }
-&#10;#llgbobbafg .gt_striped {
+&#10;#unuimlsgas .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
-&#10;#llgbobbafg .gt_table_body {
+&#10;#unuimlsgas .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -594,7 +598,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
-&#10;#llgbobbafg .gt_footnotes {
+&#10;#unuimlsgas .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -607,7 +611,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-right-width: 2px;
   border-right-color: #D3D3D3;
 }
-&#10;#llgbobbafg .gt_footnote {
+&#10;#unuimlsgas .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -615,7 +619,7 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   padding-left: 5px;
   padding-right: 5px;
 }
-&#10;#llgbobbafg .gt_sourcenotes {
+&#10;#unuimlsgas .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -628,64 +632,64 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   border-right-width: 2px;
   border-right-color: #D3D3D3;
 }
-&#10;#llgbobbafg .gt_sourcenote {
+&#10;#unuimlsgas .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
   padding-left: 5px;
   padding-right: 5px;
 }
-&#10;#llgbobbafg .gt_left {
+&#10;#unuimlsgas .gt_left {
   text-align: left;
 }
-&#10;#llgbobbafg .gt_center {
+&#10;#unuimlsgas .gt_center {
   text-align: center;
 }
-&#10;#llgbobbafg .gt_right {
+&#10;#unuimlsgas .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
-&#10;#llgbobbafg .gt_font_normal {
+&#10;#unuimlsgas .gt_font_normal {
   font-weight: normal;
 }
-&#10;#llgbobbafg .gt_font_bold {
+&#10;#unuimlsgas .gt_font_bold {
   font-weight: bold;
 }
-&#10;#llgbobbafg .gt_font_italic {
+&#10;#unuimlsgas .gt_font_italic {
   font-style: italic;
 }
-&#10;#llgbobbafg .gt_super {
+&#10;#unuimlsgas .gt_super {
   font-size: 65%;
 }
-&#10;#llgbobbafg .gt_footnote_marks {
+&#10;#unuimlsgas .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
-&#10;#llgbobbafg .gt_asterisk {
+&#10;#unuimlsgas .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
-&#10;#llgbobbafg .gt_indent_1 {
+&#10;#unuimlsgas .gt_indent_1 {
   text-indent: 5px;
 }
-&#10;#llgbobbafg .gt_indent_2 {
+&#10;#unuimlsgas .gt_indent_2 {
   text-indent: 10px;
 }
-&#10;#llgbobbafg .gt_indent_3 {
+&#10;#unuimlsgas .gt_indent_3 {
   text-indent: 15px;
 }
-&#10;#llgbobbafg .gt_indent_4 {
+&#10;#unuimlsgas .gt_indent_4 {
   text-indent: 20px;
 }
-&#10;#llgbobbafg .gt_indent_5 {
+&#10;#unuimlsgas .gt_indent_5 {
   text-indent: 25px;
 }
-&#10;#llgbobbafg .katex-display {
+&#10;#unuimlsgas .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
-&#10;#llgbobbafg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+&#10;#unuimlsgas div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -743,3 +747,85 @@ tbl_regression(lm(body_mass_g ~ ., data_infused))
   </tfoot>
 </table>
 </div>
+
+## Analysis helpers
+
+### Summarize overall and in each group, separately.
+
+We often want to summarize results overall and in subgroups based on
+multiple grouping variables. The `dplyr::summarize` function is almost
+perfect for this, but it isn’t designed to let you summarize overall and
+within multiple subgroups in one call. That’s why we include
+`summarize_each_group` in `pericircle` - it lets you run
+`dplyr::summarize` in all the groups of interest, without duplicating
+code.
+
+``` r
+
+data_peng %>% 
+  summarize_each_group(mean_weight = mean(body_mass_g, na.rm = TRUE),
+                       nobs = n(),
+                       groups = c("species", "sex"))
+#> # A tibble: 7 × 4
+#>   .group_variable .group_level mean_weight  nobs
+#>   <chr>           <chr>              <dbl> <int>
+#> 1 .overall        .overall           4202.   344
+#> 2 species         Adelie             3701.   152
+#> 3 species         Chinstrap          3733.    68
+#> 4 species         Gentoo             5076.   124
+#> 5 sex             female             3862.   165
+#> 6 sex             male               4546.   168
+#> 7 sex             <NA>               4006.    11
+```
+
+Note that `summarize_each_group` works with grouped data too, but it
+does not nest the groups. If you are hoping to summarize groups within
+groups, `summarize_each_group` is not the tool to use.
+
+``` r
+
+data_peng %>% 
+  group_by(species, sex) %>% 
+  summarize_each_group(mean_weight = mean(body_mass_g, na.rm = TRUE),
+                       nobs = n())
+#> # A tibble: 7 × 4
+#>   .group_variable .group_level mean_weight  nobs
+#>   <chr>           <chr>              <dbl> <int>
+#> 1 .overall        .overall           4202.   344
+#> 2 species         Adelie             3701.   152
+#> 3 species         Chinstrap          3733.    68
+#> 4 species         Gentoo             5076.   124
+#> 5 sex             female             3862.   165
+#> 6 sex             male               4546.   168
+#> 7 sex             <NA>               4006.    11
+```
+
+But if you *really* want to use `summarize_each_group()` with nested
+groups, here’s one way to do that:
+
+``` r
+
+data_peng %>% 
+  split(.$species) %>% 
+  map_dfr(
+    ~ .x %>% 
+      group_by(sex) %>% 
+      summarize_each_group(mean_weight = mean(body_mass_g, na.rm = TRUE),
+                           nobs = n()),
+    .id = 'species'
+  )
+#> # A tibble: 11 × 5
+#>    species   .group_variable .group_level mean_weight  nobs
+#>    <chr>     <chr>           <chr>              <dbl> <int>
+#>  1 Adelie    .overall        .overall           3701.   152
+#>  2 Adelie    sex             female             3369.    73
+#>  3 Adelie    sex             male               4043.    73
+#>  4 Adelie    sex             <NA>               3540      6
+#>  5 Chinstrap .overall        .overall           3733.    68
+#>  6 Chinstrap sex             female             3527.    34
+#>  7 Chinstrap sex             male               3939.    34
+#>  8 Gentoo    .overall        .overall           5076.   124
+#>  9 Gentoo    sex             female             4680.    58
+#> 10 Gentoo    sex             male               5485.    61
+#> 11 Gentoo    sex             <NA>               4588.     5
+```

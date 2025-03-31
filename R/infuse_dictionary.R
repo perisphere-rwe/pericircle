@@ -16,6 +16,17 @@
 #'   - `"descriptive"` : include labels, e.g., "Age, *years*"
 #'   - `"model"` : include label and model divisor, e.g., "Age, *per 10 years*"
 #'
+#' @param divby_suffix a character value indicating what term will be appended
+#'   to names of numeric variables when they are transformed by dividing them
+#'   by the value given for `divby` in their dictionary information. Note that
+#'   this is only relevant when `units = "model"`. For example, if our data
+#'   contain a column called `foo` with `divby = 5` and `divby_suffix = "divby"`,
+#'   then the output would contain a new column called `foo_divby_5`, and the
+#'   values in this column would be equal to values of `foo` divided by 5.
+#'   If you want to live dangerously (i.e., modify the columns and don't make
+#'   new ones), use `divby_suffix = NULL` to overwrite existing columns
+#'   with their modified versions.
+#'
 #' @param warn_undocumented a logical value. If `TRUE` (default), then
 #'   a warning is thrown whenever 1 or more variables in `data` do not
 #'   have supporting documentation in `dictionary`. If `FALSE`, then
@@ -52,6 +63,7 @@
 infuse_dictionary <- function(data,
                               dictionary = NULL,
                               units = "none",
+                              divby_suffix = 'divby',
                               warn_undocumented = TRUE){
 
   checkmate::assert_character(units, null.ok = FALSE, len = 1)
@@ -101,8 +113,19 @@ infuse_dictionary <- function(data,
 
     if(dictionary$variables[[i]]$type == "Numeric"){
 
-      if(units == 'model') data[[i]] %<>%
-          magrittr::divide_by(dictionary$variables[[i]]$divby_modeling %||% 1)
+      if(units == 'model'){
+
+        divby_name <- i
+        divby_value <- dictionary$variables[[i]]$divby_modeling %||% 1
+
+        if(!is.null(divby_suffix)){
+          divby_name <- paste(i, divby_suffix, divby_value, sep = "_")
+        }
+
+        data <- data %>%
+          dplyr::mutate(!!divby_name := .data[[i]] / divby_value, .after = i)
+
+      }
 
     }
 

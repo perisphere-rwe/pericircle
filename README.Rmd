@@ -161,19 +161,59 @@ data_peng %>%
 
 ### Attach all information at once
 
-`infuse_dictionary()` puts all the relevant information from a data dictionary into an existing dataset. This can smooth out your code when you use packages that automatically incorporate labels into their outputs, such as `gtsummary`. In the example below, we infuse our data with the dictionary we created and specify that we want to format continuous variables using their modeling units (e.g., bill length is modeled per 10 mm). Note that when you infuse data with dictionaries and specify `units = 'model'`, the corresponding variables will be divided by their designated `divby_model` value.
+`infuse_dictionary()` puts all the relevant information from a data dictionary into an existing dataset. This can smooth out your code when you use packages that automatically incorporate labels into their outputs, such as `gtsummary`. In the example below, we infuse our data with the dictionary we created and specify that we want to format continuous variables using their modeling units (e.g., bill length is modeled per 10 mm). Note that when you infuse data with dictionaries and specify `units = 'model'`, the corresponding variables will be divided by their designated `divby_model` value and new columns will be created. If you don't want new columns, you can specify `divby_suffix = NULL` when you infuse.
 
 ```{r}
 
 library(gtsummary)
 
 data_infused <- data_peng %>% 
-  infuse_dictionary(dd_peng, units = 'model')
+  infuse_dictionary(dd_peng, units = 'model', divby_suffix = NULL)
 
-tbl_regression(lm(body_mass_g ~ ., data_infused))
+fit <- lm(formula = body_mass_g ~ ., data = data_infused)
+
+tbl_regression(fit)
 
 ```
 
+## Analysis helpers
 
+### Summarize overall and in each group, separately.
 
+We often want to summarize results overall and in subgroups based on multiple grouping variables. The `dplyr::summarize` function is almost perfect for this, but it isn't designed to let you summarize overall and within multiple subgroups in one call. That's why we include `summarize_each_group` in `pericircle` - it lets you run `dplyr::summarize` in all the groups of interest, without duplicating code.
+
+```{r summarize_each_group-1}
+
+data_peng %>% 
+  summarize_each_group(mean_weight = mean(body_mass_g, na.rm = TRUE),
+                       nobs = n(),
+                       groups = c("species", "sex"))
+
+```
+
+Note that `summarize_each_group` works with grouped data too, but it does not nest the groups. If you are hoping to summarize groups within groups, `summarize_each_group` is not the tool to use.
+
+```{r summarize_each_group-2}
+
+data_peng %>% 
+  group_by(species, sex) %>% 
+  summarize_each_group(mean_weight = mean(body_mass_g, na.rm = TRUE),
+                       nobs = n())
+```
+
+But if you *really* want to use `summarize_each_group()` with nested groups, here's one way to do that:
+
+```{r summarize_each_group-3}
+
+data_peng %>% 
+  split(.$species) %>% 
+  map_dfr(
+    ~ .x %>% 
+      group_by(sex) %>% 
+      summarize_each_group(mean_weight = mean(body_mass_g, na.rm = TRUE),
+                           nobs = n()),
+    .id = 'species'
+  )
+
+```
 
