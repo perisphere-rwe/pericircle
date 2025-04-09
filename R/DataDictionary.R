@@ -115,7 +115,7 @@ DataVariable <- R6Class(
       self$get_description() %||% self$fetch_label(),
 
     fetch_units = function()
-      self$get_units() %||% "unit",
+      self$get_units(),
 
     fetch_divby_modeling = function()
       self$get_divby_modeling() %||% 1,
@@ -214,15 +214,22 @@ NumericVariable <- R6Class(
     },
 
     get_label_and_unit = function(sep = ', '){
-      paste(self$fetch_label(),
-            self$fetch_units(),
-            sep = sep)
+
+      # present units if they are there
+      if(!is.null(self$fetch_units)){
+        return(paste(self$fetch_label(),
+                     self$fetch_units(),
+                     sep = sep))
+      }
+
+      self$fetch_label()
+
     },
 
     get_label_divby = function(){
       paste0(self$fetch_label(), ", per ",
              self$fetch_divby_modeling(), " ",
-             self$fetch_units())
+             self$fetch_units() %||% "units")
     },
 
     # Constructor
