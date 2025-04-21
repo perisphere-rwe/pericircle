@@ -639,16 +639,24 @@ as_data_dictionary <- function(x){
     .y = names(x),
     .f = ~ switch(
       class(.x)[1],
-      'factor' = NominalVariable$new(name = .y,
-                                     label = attr(.x, 'label'),
-                                     category_levels = levels(.x)),
-      'character' = NominalVariable$new(name = .y,
-                                        label = attr(.x, 'label'),
-                                        category_levels = unique(.x)),
-      'numeric' = NumericVariable$new(name = .y,
-                                      label = attr(.x, 'label')),
-      'integer' = NumericVariable$new(name = .y,
-                                      label = attr(.x, 'label')),
+      'factor' = NominalVariable$new(
+        name = .y,
+        label = attr(.x, 'label'),
+        category_levels = levels(.x)
+      ),
+      'character' = NominalVariable$new(
+        name = .y,
+        label = attr(.x, 'label'),
+        category_levels = unique(stats::na.omit(.x))
+      ),
+      'numeric' = NumericVariable$new(
+        name = .y,
+        label = attr(.x, 'label')
+      ),
+      'integer' = NumericVariable$new(
+        name = .y,
+        label = attr(.x, 'label')
+      ),
       NULL
     )
   )
