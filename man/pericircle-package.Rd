@@ -4,9 +4,9 @@
 \name{pericircle-package}
 \alias{pericircle}
 \alias{pericircle-package}
-\title{pericircle: What the Package Does (One Line, Title Case)}
+\title{pericircle: A Slice of Perisphere}
 \description{
-What the package does (one paragraph).
+Frequently used tools in Perisphere's analyses designed to prevent redundancies and promote readable, maintainable code.
 }
 \seealso{
 Useful links:
@@ -17,7 +17,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Byron Jaeger \email{bjaeger@wakehealth.edu} (\href{https://orcid.org/0000-0001-7399-2299}{ORCID})
 
 }
 \keyword{internal}

@@ -195,9 +195,14 @@ set_factors <- function(dictionary, ..., .relevel){
 
     } else {
 
-      current_labs[match(current_lvls, input_lvls[[1]])] <- input_labs[[1]]
+      # put the inputs into the existing labels.
+      input_key <- purrr::set_names(input_labs[[1]], input_lvls[[1]])
 
-      input_labs[[1]] <- current_labs
+      # be careful not to mess up the established order
+      updated_key <- purrr::set_names(current_labs, current_lvls)
+      updated_key[names(input_key)] <- input_key
+
+      input_labs[[1]] <- purrr::set_names(updated_key, NULL)
 
       dictionary$modify_dictionary(input_labs, field = 'category_labels')
 
