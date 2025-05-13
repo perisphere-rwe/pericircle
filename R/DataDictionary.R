@@ -386,9 +386,9 @@ DataDictionary <- R6Class(
 
       switch(
         units,
-        'none'        = self$variables[[name]]$fetch_label(),
-        'descriptive' = self$variables[[name]]$fetch_label_and_unit(),
-        'model'       = self$variables[[name]]$fetch_label_divby()
+        'none'        = self$variables[[name]]$get_label(),
+        'descriptive' = self$variables[[name]]$get_label_and_unit(),
+        'model'       = self$variables[[name]]$get_label_divby()
       )
 
     },
@@ -483,7 +483,7 @@ DataDictionary <- R6Class(
 
       x_uni <- unique(stats::na.omit(x))
 
-      variable_recoder <- self$get_variable_recoder(quiet = TRUE)
+      variable_recoder <- self$get_variable_recoder(quiet = TRUE, units = units)
       level_recoder <- self$get_level_recoder(quiet = TRUE)
 
       if(!is_empty(list(...))){
