@@ -15,10 +15,23 @@ dd <- as_data_dictionary(data_test) %>%
 
 recode_with_extras <- c("number", "integer", "extra_1", "extra_2")
 
-test_that("unaccounted unique values are listed", code = {
+test_that("unaccounted unique values are listed in errors", code = {
 
-  expect_error(dd$recode(recode_with_extras), regexp = "extra")
+  expect_error(dd$recode(recode_with_extras,
+                         extra_1 = "This extra is okay"),
+               regexp = "extra_2")
 
 })
 
+
+test_that("unaccounted unique values can be recoded on the fly", code = {
+
+  expect_equal(
+    dd$recode(recode_with_extras,
+              extra_1 = "This extra is okay",
+              extra_2 = "This is okay too"),
+    c("A number", "An integer", "This extra is okay", "This is okay too")
+  )
+
+})
 

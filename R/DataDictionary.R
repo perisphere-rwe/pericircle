@@ -479,12 +479,17 @@ DataDictionary <- R6Class(
 
     },
 
-    recode = function(x, units = 'none'){
+    recode = function(x, ..., units = 'none'){
 
       x_uni <- unique(stats::na.omit(x))
 
       variable_recoder <- self$get_variable_recoder(quiet = TRUE)
       level_recoder <- self$get_level_recoder(quiet = TRUE)
+
+      if(!is_empty(list(...))){
+        variable_recoder %<>% c(list(...))
+        level_recoder %<>% c(list(...))
+      }
 
       x_is_variable_names <- all(x_uni %in% names(variable_recoder))
       x_is_variable_levels <- all(x_uni %in% names(level_recoder))
