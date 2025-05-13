@@ -163,7 +163,7 @@ data_peng %>%
 
 `infuse_dictionary()` puts all the relevant information from a data dictionary into an existing dataset. This can smooth out your code when you use packages that automatically incorporate labels into their outputs, such as `gtsummary`. In the example below, we infuse our data with the dictionary we created and specify that we want to format continuous variables using their modeling units (e.g., bill length is modeled per 10 mm). Note that when you infuse data with dictionaries and specify `units = 'model'`, the corresponding variables will be divided by their designated `divby_model` value and new columns will be created. If you don't want new columns, you can specify `divby_suffix = NULL` when you infuse.
 
-```{r}
+```{r, eval = FALSE}
 
 library(gtsummary)
 
@@ -175,6 +175,11 @@ fit <- lm(formula = body_mass_g ~ ., data = data_infused)
 tbl_regression(fit)
 
 ```
+
+```{r}
+knitr::include_graphics('img/screen-regression_table.png')
+```
+
 
 ## Analysis helpers
 
@@ -215,5 +220,30 @@ data_peng %>%
     .id = 'species'
   )
 
+```
+
+### Help! `summarize_each_group` broke the data dictionary
+
+Yes, `summarize_each_group` can throw off the `recode()` function in your data dictionary, but it's easy to fix. This issue occurs b/c `summarize_each_group` adds a row for the overall sample called ".overall", and this value doesn't have a corresponding label in the dictionary, so `recode()` throws a hard stop to tell you (it may just be a warning in the future). 
+
+```{r, error=TRUE}
+
+data_peng %>% 
+  group_by(species, sex) %>% 
+  summarize_each_group(mean_weight = mean(body_mass_g, na.rm = TRUE),
+                       nobs = n()) %>% 
+  mutate(.group_variable = dd_peng$recode(.group_variable))
+
+```
+
+The fix: add a label for the ".overall" group in the call to `recode`.
+
+```{r}
+data_peng %>% 
+  group_by(species, sex) %>% 
+  summarize_each_group(mean_weight = mean(body_mass_g, na.rm = TRUE),
+                       nobs = n()) %>% 
+  mutate(.group_variable = dd_peng$recode(.group_variable, 
+                                          .overall = "Overall"))
 ```
 
