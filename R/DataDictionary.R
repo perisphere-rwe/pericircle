@@ -439,7 +439,7 @@ DataDictionary <- R6Class(
       checkmate::assert_character(name, null.ok = TRUE)
 
       choices <- self$variables %>%
-        map_lgl(~.x$type == "Nominal") %>%
+        purrr::map_lgl(~.x$type == "Nominal") %>%
         which() %>%
         names()
 
@@ -515,8 +515,12 @@ DataDictionary <- R6Class(
         return(dplyr::recode(x, !!!variable_recoder))
       }
 
+      leftovers <- setdiff(x_uni, c(names(variable_recoder),
+                                    names(level_recoder)))
+
       stop("Unique values in x could not be matched with variable labels ",
-           "or variable level labels in the dictionary.",
+           "or variable level labels in the dictionary. The x values that ",
+           "could not be matched are: ", paste(leftovers, collapse = ", "),
            call. = FALSE)
 
     },
