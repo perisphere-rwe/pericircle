@@ -15,4 +15,10 @@ dd <- as_data_dictionary(data_test) %>%
 
 recode_with_extras <- c("number", "integer", "extra_1", "extra_2")
 
-dd$recode(recode_with_extras)
+test_that("unaccounted unique values are listed", code = {
+
+  expect_error(dd$recode(recode_with_extras), regexp = "extra")
+
+})
+
+
