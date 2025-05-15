@@ -7,6 +7,7 @@
       Numeric Variable:
         Name               : age 
         Label              : Age of participant 
+        Acronym            : none 
         Description        : none 
         Units              : years 
         Modeling Divisor   : 10 
@@ -21,6 +22,7 @@
       Nominal Variable:
         Name               : age_group 
         Label              : Age group 
+        Acronym            : none 
         Description        : Ages of 0 to < 50, 50 to < 60, and ≥ 60 years 
         Category Levels    : age_lt_50, age_gteq_50_lt_60, age_gteq_60 
         Category Labels    : 0 to < 50, 50 to < 60, ≥ 60 
@@ -33,9 +35,10 @@
         set_category_labels(b = "A small lion")
     Output
       Data Dictionary:
-      # A tibble: 2 x 7
-        name  label   description units divby_modeling category_levels category_labels
-        <chr> <chr>   <chr>       <chr> <chr>          <chr>           <chr>          
-      1 a     example A variable~ years none           none            none           
-      2 b     catego~ none        none  none           cat             A small lion   
+      # A tibble: 2 x 8
+        name  label           description acronym units divby_modeling category_levels
+        <chr> <chr>           <chr>       <chr>   <chr> <chr>          <chr>          
+      1 a     example         A variable~ none    years none           none           
+      2 b     categorical ex~ none        none    none  none           cat            
+      # i 1 more variable: category_labels <chr>
 
