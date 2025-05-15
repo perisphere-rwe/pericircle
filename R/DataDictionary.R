@@ -11,6 +11,7 @@ DataVariable <- R6Class(
     name = NULL,
     type = NULL,
     label = NULL,
+    acronym = NULL,
     description = NULL,
 
     # only relevant for nominal variables but should be
@@ -30,6 +31,7 @@ DataVariable <- R6Class(
              "name"            = self$check_name(value),
              "type"            = self$check_type(value),
              "label"           = self$check_label(value),
+             "acronym"         = self$check_acronym(value),
              "description"     = self$check_description(value),
              "units"           = self$check_units(value),
              "divby_modeling"  = self$check_divby_modeling(value),
@@ -58,6 +60,20 @@ DataVariable <- R6Class(
                                   null.ok = TRUE)
     },
 
+    check_acronym = function(value) {
+
+      if(is.null(self$label)){
+        stop("Acronyms cannot be set until label is set", call. = FALSE)
+      }
+
+      acronym <- value
+      checkmate::assert_character(acronym,
+                                  any.missing = FALSE,
+                                  null.ok = TRUE,
+                                  names = 'unique')
+
+    },
+
     check_description = function(value) {
       description <- value
       checkmate::assert_character(description,
@@ -72,19 +88,47 @@ DataVariable <- R6Class(
     },
 
     fmt_element = function(x, collapse = ', '){
+
       if(is.null(self[[x]])) return("none")
-      as.character(paste(self$get_element(x), collapse = collapse))
+
+      .values <- self$get_element(x)
+      .names <- names(.values)
+
+      if(!is.null(.names)){
+        .values <- paste(.names, .values, sep = ' = ')
+      }
+
+      as.character(paste(.values, collapse = collapse))
+
     },
 
     set_element = function(field, value){
+
       self$check_input(field, value)
+
+      current_value <- self$get_element(field)
+      current_names <- names(current_value)
+
+      if(!is.null(current_names)){
+
+        # TODO: write a more specific error here
+        new_value <- value
+        stopifnot(all(names(new_value) %in% current_names))
+
+        value <- current_value
+        value[names(new_value)] <- new_value
+
+      }
+
       self[[field]] <- value
+
     },
 
     # modify in place
     set_name = function(value) self$set_element("name", value),
     set_type = function(value) self$set_element("type", value),
     set_label = function(value) self$set_element("label", value),
+    set_acronym = function(value) self$set_element("acronym", value),
     set_description = function(value) self$set_element("description", value),
     set_units = function(value) self$set_element("units", value),
     set_divby_modeling = function(value) self$set_element("divby_modeling", value),
@@ -94,12 +138,34 @@ DataVariable <- R6Class(
     # return the value (can return NULL)
     get_name = function() self$get_element("name"),
     get_type = function() self$get_element("type"),
-    get_label = function() self$get_element("label"),
+
+    get_label = function(use_acro = NULL){
+
+      if(is.null(use_acro))
+        return(self$get_element("label"))
+
+      if(is.null(self$acronym) && !is.null(use_acro))
+        stop("no acronyms for ", self$name, call. = FALSE)
+
+      # if_else wouldn't work here - result needs to allow for length >1
+      # ifelse doesn't work either - result needs to be named
+      # => keep the clunky if() else statement
+      pattern <- if(use_acro){
+        purrr::set_names(names(self$acronym), self$acronym)
+      }  else {
+        self$acronym
+      }
+
+      stringr::str_replace_all(string = self$get_label(), pattern = pattern)
+
+    },
+
+    get_acronym = function() self$get_element("acronym"),
     get_description = function() self$get_element("description"),
     get_units = function() self$get_element("units"),
     get_divby_modeling = function() self$get_element("divby_modeling"),
     get_category_levels = function() self$get_element("category_levels"),
-    get_category_labels = function() self$get_element("category_labels"),
+    get_category_labels = function(use_acro = NULL) self$get_element("category_labels"),
 
     # return a value, falling back to secondary options if needed
     fetch_name = function()
@@ -108,8 +174,11 @@ DataVariable <- R6Class(
     fetch_type = function()
       self$get_type(),
 
-    fetch_label = function()
-      self$get_label() %||% self$fetch_name(),
+    fetch_label = function(use_acro=NULL)
+      self$get_label(use_acro) %||% self$fetch_name(),
+
+    fetch_acronym = function()
+      self$get_acronym(),
 
     fetch_description = function()
       self$get_description() %||% self$fetch_label(),
@@ -130,6 +199,7 @@ DataVariable <- R6Class(
     fmt_name = function() self$fmt_element("name"),
     fmt_type = function() self$fmt_element("type"),
     fmt_label = function() self$fmt_element("label"),
+    fmt_acronym = function() self$fmt_element("acronym"),
     fmt_description = function() self$fmt_element("description"),
     fmt_units = function() self$fmt_element("units"),
     fmt_divby_modeling = function() self$fmt_element("divby_modeling"),
@@ -140,6 +210,7 @@ DataVariable <- R6Class(
     initialize = function(name,
                           type = "Data",
                           label = NULL,
+                          acronym = NULL,
                           description = NULL) {
 
       if (missing(name) || !is.character(name) || length(name) != 1) {
@@ -158,6 +229,9 @@ DataVariable <- R6Class(
       self$label       <- label
       self$description <- description
 
+      # can't check acronym until label is set
+      self$check_acronym(acronym)
+      self$acronym <- acronym
 
     },
 
@@ -166,6 +240,7 @@ DataVariable <- R6Class(
       cat(self$fmt_type(), "Variable:\n")
       cat("  Name               :", self$fmt_name(),        "\n")
       cat("  Label              :", self$fmt_label(),       "\n")
+      cat("  Acronym            :", self$fmt_acronym(),     "\n")
       cat("  Description        :", self$fmt_description(), "\n")
     }
   )
@@ -196,6 +271,56 @@ NumericVariable <- R6Class(
       )
     },
 
+    check_acronym = function(value) {
+
+      if(is.null(value)) return(value)
+
+      # this ensures label isn't null
+      super$check_acronym(value)
+
+      label <- self$label
+
+      acro_string_in_label <-
+        stringr::str_detect(label, pattern = stringr::fixed(value))
+      acro_abbrv_in_label <-
+        stringr::str_detect(label, pattern = stringr::fixed(names(value)))
+
+      if(!all(acro_string_in_label | acro_abbrv_in_label)){
+
+        # check for case-sensitive mistake
+        .label <- tolower(label)
+        .value <- purrr::set_names(tolower(value), tolower(names(value)))
+
+        .acro_string_in_label <-
+          stringr::str_detect(.label, pattern = stringr::fixed(.value))
+        .acro_abbrv_in_label <-
+          stringr::str_detect(.label, pattern = stringr::fixed(names(.value)))
+
+        .case_msg <- NULL
+
+        if(all(.acro_string_in_label | .acro_abbrv_in_label)){
+          .case_msg <-
+            "\n  check capitalization - this is case-sensitive"
+        }
+
+        link <- paste(names(value), value, sep = " = ")
+
+        stop(
+          "could not match supplied acronym with label:\n",
+          "  - label: ", label, "\n",
+          "  - attempted match: ", paste(link, collapse = ", "), "\n",
+          "  all acronym names or values must appear in label",
+          .case_msg,
+          call. = FALSE
+        )
+
+
+      }
+
+
+
+    },
+
     check_units = function(value) {
       units <- value
       checkmate::assert_character(units,
@@ -213,21 +338,21 @@ NumericVariable <- R6Class(
                                 null.ok = TRUE)
     },
 
-    get_label_and_unit = function(sep = ', '){
+    get_label_and_unit = function(sep = ', ', use_acro=NULL){
 
       # present units if they are there
       if(!is.null(self$fetch_units)){
-        return(paste(self$fetch_label(),
+        return(paste(self$fetch_label(use_acro=use_acro),
                      self$fetch_units(),
                      sep = sep))
       }
 
-      self$fetch_label()
+      self$fetch_label(use_acro)
 
     },
 
-    get_label_divby = function(){
-      paste0(self$fetch_label(), ", per ",
+    get_label_divby = function(use_acro=NULL){
+      paste0(self$fetch_label(use_acro=use_acro), ", per ",
              self$fetch_divby_modeling(), " ",
              self$fetch_units() %||% "units")
     },
@@ -235,6 +360,7 @@ NumericVariable <- R6Class(
     # Constructor
     initialize = function(name,
                           label = NULL,
+                          acronym = NULL,
                           description = NULL,
                           units = NULL,
                           divby_modeling = NULL) {
@@ -244,6 +370,7 @@ NumericVariable <- R6Class(
         name = name,
         type = "Numeric",
         label = label,
+        acronym = acronym,
         description = description
       )
 
@@ -287,6 +414,48 @@ NominalVariable <- R6Class(
                                   null.ok = TRUE)
     },
 
+    check_acronym = function(value){
+
+      if(is.null(value)) return(value)
+
+      # this ensures label isn't null
+      super$check_acronym(value)
+
+      label <- self$label
+      category_labels <- self$fetch_category_labels()
+
+      acro_string_in_label <-
+        stringr::str_detect(label,
+                            pattern = stringr::fixed(value))
+
+      acro_string_in_category_labels <-
+        stringr::str_detect(category_labels,
+                            pattern = stringr::fixed(value))
+
+      acro_abbrv_in_label <-
+        stringr::str_detect(label,
+                            pattern = stringr::fixed(names(value)))
+
+      acro_abbrv_in_category_labels <-
+        stringr::str_detect(category_labels,
+                            pattern = stringr::fixed(names(value)))
+
+      if(!all(acro_string_in_label |
+              acro_abbrv_in_label |
+              acro_string_in_category_labels |
+              acro_abbrv_in_category_labels)){
+        stop(
+          "could not match supplied acronym with label or categories:\n",
+          "  - acronym names: ", paste(names(value), collapse = ", "), "\n",
+          "  - acronym values: ", paste(value, collapse = ", "), "\n",
+          "  - label: ", label, "\n",
+          "  - categories: ", paste(category_labels, collapse = ', '),
+          "  all acronym names or values must appear in label or categories"
+        )
+      }
+
+    },
+
     check_units = function(value) {
       if(!is.null(value)) stop(
         "units cannot be specified for a nominal variable",
@@ -301,17 +470,40 @@ NominalVariable <- R6Class(
       )
     },
 
-    get_label_and_unit = function(sep = ', '){
-      self$fetch_label()
+    get_label_and_unit = function(sep = ', ', use_acro=NULL){
+      self$fetch_label(use_acro=use_acro)
     },
 
-    get_label_divby = function(){
-      self$fetch_label()
+    get_label_divby = function(use_acro=NULL){
+      self$fetch_label(use_acro=use_acro)
+    },
+
+    get_category_labels = function(use_acro = NULL){
+
+      if(is.null(use_acro))
+        return(self$get_element("category_labels"))
+
+      if(is.null(self$acronym) && !is.null(use_acro))
+        stop("no acronyms for ", self$name, call. = FALSE)
+
+      # if_else wouldn't work here - result needs to allow for length >1
+      # ifelse doesn't work either - result needs to be named
+      # => keep the clunky if() else statement
+      pattern <- if(use_acro){
+        purrr::set_names(names(self$acronym), self$acronym)
+      } else {
+        self$acronym
+      }
+
+      stringr::str_replace_all(string = self$get_category_labels(),
+                               pattern = pattern)
+
     },
 
     # Constructor
     initialize = function(name,
                           label = NULL,
+                          acronym = NULL,
                           description = NULL,
                           category_levels = NULL,
                           category_labels = NULL) {
@@ -321,6 +513,7 @@ NominalVariable <- R6Class(
         name = name,
         type = "Nominal",
         label = label,
+        acronym = acronym,
         description = description
       )
 
@@ -382,13 +575,13 @@ DataDictionary <- R6Class(
 
     },
 
-    get_label = function(name, units = 'none'){
+    get_label = function(name, units = 'none', use_acro = NULL){
 
       switch(
         units,
-        'none'        = self$variables[[name]]$get_label(),
-        'descriptive' = self$variables[[name]]$get_label_and_unit(),
-        'model'       = self$variables[[name]]$get_label_divby()
+        'none'        = self$variables[[name]]$get_label(use_acro=use_acro),
+        'descriptive' = self$variables[[name]]$get_label_and_unit(use_acro=use_acro),
+        'model'       = self$variables[[name]]$get_label_divby(use_acro=use_acro)
       )
 
     },
@@ -399,6 +592,7 @@ DataDictionary <- R6Class(
 
     get_variable_recoder = function(name = NULL,
                                     units = 'none',
+                                    use_acro = NULL,
                                     quiet = FALSE){
 
       checkmate::assert_character(name, null.ok = TRUE)
@@ -413,7 +607,7 @@ DataDictionary <- R6Class(
 
       output <- purrr::map(
         .x = purrr::set_names(.name),
-        .f = ~ self$get_label(.x, units)
+        .f = ~ self$get_label(.x, units = units, use_acro = use_acro)
       ) %>%
         purrr::compact()
 
@@ -434,7 +628,7 @@ DataDictionary <- R6Class(
 
     },
 
-    get_level_recoder = function(name = NULL, quiet = FALSE){
+    get_level_recoder = function(name = NULL, use_acro = NULL, quiet = FALSE){
 
       checkmate::assert_character(name, null.ok = TRUE)
 
@@ -453,6 +647,10 @@ DataDictionary <- R6Class(
 
         .labs <- self$variables[[ name[i] ]]$category_labels
         .lvls <- self$variables[[ name[i] ]]$category_levels
+
+        if(!is.null(use_acro)){
+          browser()
+        }
 
         if(is.null(.labs)){
 
@@ -479,12 +677,12 @@ DataDictionary <- R6Class(
 
     },
 
-    recode = function(x, ..., units = 'none'){
+    recode = function(x, ..., units = 'none', use_acro = NULL){
 
       x_uni <- unique(stats::na.omit(x))
 
       variable_recoder <- self$get_variable_recoder(quiet = TRUE, units = units)
-      level_recoder <- self$get_level_recoder(quiet = TRUE)
+      level_recoder <- self$get_level_recoder(quiet = TRUE, use_acro = use_acro)
 
       if(!is_empty(list(...))){
         variable_recoder %<>% c(list(...))
@@ -537,6 +735,7 @@ DataDictionary <- R6Class(
         name            = purrr::map_chr(vars, ~ .x$fmt_name()),
         label           = purrr::map_chr(vars, ~ .x$fmt_label()),
         description     = purrr::map_chr(vars, ~ .x$fmt_description()),
+        acronym         = purrr::map_chr(vars, ~ .x$fmt_acronym()),
         units           = purrr::map_chr(vars, ~ .x$fmt_units()),
         divby_modeling  = purrr::map_chr(vars, ~ .x$fmt_divby_modeling()),
         category_levels = purrr::map_chr(vars, ~ .x$fmt_category_levels()),
@@ -687,6 +886,8 @@ as_data_dictionary <- function(x){
 #'   The name of the variable (required).
 #' @param label Character.
 #'   A short label for the variable (optional).
+#' @param acronym Character.
+#'   An acronym for the label (e.g., "BP = blood pressure"; optional).
 #' @param description Character.
 #'   A longer description of the variable (optional).
 #' @param units Character.
@@ -725,12 +926,14 @@ as_data_dictionary <- function(x){
 
 numeric_variable <- function(name,
                              label = NULL,
+                             acronym = NULL,
                              description = NULL,
                              units = NULL,
                              divby_modeling = NULL){
 
   NumericVariable$new(name = name,
                       label = label,
+                      acronym = acronym,
                       description = description,
                       units = units,
                       divby_modeling = divby_modeling)
@@ -745,6 +948,8 @@ numeric_variable <- function(name,
 #'   The name of the variable (required).
 #' @param label Character.
 #'   A short label for the variable (optional).
+#' @param acronym Character.
+#'   An acronym for the label (e.g., "BP = blood pressure"; optional).
 #' @param description Character.
 #'   A longer description of the variable (optional).
 #' @param category_levels Character vector.
@@ -767,12 +972,14 @@ numeric_variable <- function(name,
 #'
 nominal_variable <- function(name,
                              label = NULL,
+                             acronym = NULL,
                              description = NULL,
                              category_levels = NULL,
                              category_labels = NULL){
 
   NominalVariable$new(name = name,
                       label = label,
+                      acronym = acronym,
                       description = description,
                       category_levels = category_levels,
                       category_labels = category_labels)
