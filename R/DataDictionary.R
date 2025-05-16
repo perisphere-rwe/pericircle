@@ -113,7 +113,9 @@ DataVariable <- R6Class(
 
         # TODO: write a more specific error here
         new_value <- value
-        stopifnot(all(names(new_value) %in% current_names))
+        if(!all(names(new_value) %in% current_names)){
+          stop("new values do not match existing values")
+        }
 
         value <- current_value
         value[names(new_value)] <- new_value
@@ -144,8 +146,10 @@ DataVariable <- R6Class(
       if(is.null(use_acro))
         return(self$get_element("label"))
 
-      if(is.null(self$acronym) && !is.null(use_acro))
-        stop("no acronyms for ", self$name, call. = FALSE)
+      if(is.null(self$acronym) && !is.null(use_acro)){
+        # warning("no acronyms for ", self$name, call. = FALSE)
+        return(self$get_element("label"))
+      }
 
       # if_else wouldn't work here - result needs to allow for length >1
       # ifelse doesn't work either - result needs to be named
@@ -648,10 +652,6 @@ DataDictionary <- R6Class(
         .labs <- self$variables[[ name[i] ]]$category_labels
         .lvls <- self$variables[[ name[i] ]]$category_levels
 
-        if(!is.null(use_acro)){
-          browser()
-        }
-
         if(is.null(.labs)){
 
           if(!quiet){
@@ -681,8 +681,12 @@ DataDictionary <- R6Class(
 
       x_uni <- unique(stats::na.omit(x))
 
-      variable_recoder <- self$get_variable_recoder(quiet = TRUE, units = units)
-      level_recoder <- self$get_level_recoder(quiet = TRUE, use_acro = use_acro)
+      variable_recoder <- self$get_variable_recoder(quiet = TRUE,
+                                                    use_acro = use_acro,
+                                                    units = units)
+      level_recoder <- self$get_level_recoder(quiet = TRUE,
+                                              use_acro = use_acro)
+
 
       if(!is_empty(list(...))){
         variable_recoder %<>% c(list(...))

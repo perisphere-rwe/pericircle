@@ -193,7 +193,13 @@ test_that(
       set_labels(number = "A double value",
                  integer = "An integer value") %>%
       set_descriptions(factor = "A factor variable with one level") %>%
-      set_divby_modeling(number = 10)
+      set_divby_modeling(number = 10) %>%
+      set_acronyms(number = c(DBL = "double", V = "value"))
+
+    expect_equal(
+      dd_set_label$recode("number", use_acro = TRUE),
+      "A DBL V"
+    )
 
     # access new values in dictionary
 

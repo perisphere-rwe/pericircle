@@ -141,7 +141,37 @@ set_factor_order <- function(dictionary, ...){
 
 }
 
+#' @rdname set_labels
+#' @export
+set_acronyms <- function(dictionary, ...){
 
+  checkmate::assert_class(dictionary, "DataDictionary")
+
+  .dots <- list(...)
+
+  for(i in names(.dots)){
+
+    # expects named input (null names => error)
+    checkmate::assert_character(i, .var.name = i, null.ok = FALSE)
+
+    # Here, i is the name, so it should match an existing name in dictionary
+    checkmate::assert_choice(i,
+                             .var.name = i,
+                             choices = dictionary$get_variable_names())
+
+    current_acro <- dictionary$variables[[i]]$get_acronym()
+
+    if(!is.null(current_acro)){
+      stop("Acronyms can only be set once", call. = FALSE)
+    }
+
+    dictionary$modify_dictionary(.dots[i], field = 'acronym')
+
+  }
+
+  dictionary
+
+}
 
 set_factors <- function(dictionary, ..., .relevel){
 
