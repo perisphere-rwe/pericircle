@@ -9,6 +9,7 @@
 \alias{set_category_labels}
 \alias{set_factor_labels}
 \alias{set_factor_order}
+\alias{set_acronyms}
 \title{Modify Data Dictionary Elements}
 \usage{
 set_labels(dictionary, ...)
@@ -26,6 +27,8 @@ set_category_labels(dictionary, ...)
 set_factor_labels(dictionary, ...)
 
 set_factor_order(dictionary, ...)
+
+set_acronyms(dictionary, ...)
 }
 \arguments{
 \item{dictionary}{A \link[=data_dictionary]{data dictionary} object.}

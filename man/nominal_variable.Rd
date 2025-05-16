@@ -7,6 +7,7 @@
 nominal_variable(
   name,
   label = NULL,
+  acronym = NULL,
   description = NULL,
   category_levels = NULL,
   category_labels = NULL
@@ -18,6 +19,9 @@ The name of the variable (required).}
 
 \item{label}{Character.
 A short label for the variable (optional).}
+
+\item{acronym}{Character.
+An acronym for the label (e.g., "BP = blood pressure"; optional).}
 
 \item{description}{Character.
 A longer description of the variable (optional).}
