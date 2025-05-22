@@ -486,15 +486,15 @@ DataDictionary <- R6Class(
       variable_recoder <- self$get_variable_recoder(quiet = TRUE, units = units)
       level_recoder <- self$get_level_recoder(quiet = TRUE)
 
+      x_in_variable_names <- x_uni %in% names(variable_recoder)
+      x_in_variable_levels <- x_uni %in% names(level_recoder)
+
       if(!is_empty(list(...))){
         variable_recoder %<>% c(list(...))
         level_recoder %<>% c(list(...))
       }
 
-      x_is_variable_names <- all(x_uni %in% names(variable_recoder))
-      x_is_variable_levels <- all(x_uni %in% names(level_recoder))
-
-      if(x_is_variable_levels && x_is_variable_names){
+      if(any(x_in_variable_levels & x_in_variable_names)){
         stop("unique values of x were found to be present in ",
              "both the variable labels and the category labels ",
              "for the given dictionary. It is not clear which ",
@@ -502,7 +502,7 @@ DataDictionary <- R6Class(
              call. = FALSE)
       }
 
-      if(x_is_variable_levels){
+      if(any(x_in_variable_levels)){
 
         if(any(duplicated(level_recoder))){
           stop("there are duplicated levels in the data dictionary. ",
@@ -512,21 +512,29 @@ DataDictionary <- R6Class(
                call. = FALSE)
         }
 
-        return(dplyr::recode(x, !!!level_recoder))
-
       }
 
-      if(x_is_variable_names){
+      if(all(x_in_variable_levels)){
+        return(dplyr::recode(x, !!!level_recoder))
+      }
+
+      if(all(x_in_variable_names)){
         return(dplyr::recode(x, !!!variable_recoder))
       }
 
       leftovers <- setdiff(x_uni, c(names(variable_recoder),
                                     names(level_recoder)))
 
-      stop("Unique values in x could not be matched with variable labels ",
-           "or variable level labels in the dictionary. The x values that ",
-           "could not be matched are: ", paste(leftovers, collapse = ", "),
-           call. = FALSE)
+      if(!is_empty(leftovers)){
+        warning(
+          "Unique values in x could not be matched with variable labels ",
+          "or variable level labels in the dictionary. The x values that ",
+          "could not be matched are: ", paste(leftovers, collapse = ", "),
+          call. = FALSE
+        )
+      }
+
+      dplyr::recode(x, !!!c(variable_recoder, level_recoder))
 
     },
 
