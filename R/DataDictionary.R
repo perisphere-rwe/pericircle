@@ -530,6 +530,8 @@ DataDictionary <- R6Class(
           "Unique values in x could not be matched with variable labels ",
           "or variable level labels in the dictionary. The x values that ",
           "could not be matched are: ", paste(leftovers, collapse = ", "),
+          ". To disable this warning, set `warn_unmatched = FALSE` in the ",
+          "call to `recode()`.",
           call. = FALSE
         )
       }
