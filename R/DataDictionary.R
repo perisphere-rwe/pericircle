@@ -479,7 +479,7 @@ DataDictionary <- R6Class(
 
     },
 
-    recode = function(x, ..., units = 'none'){
+    recode = function(x, ..., units = 'none', warn_unmatched = TRUE){
 
       x_uni <- unique(stats::na.omit(x))
 
@@ -525,7 +525,7 @@ DataDictionary <- R6Class(
       leftovers <- setdiff(x_uni, c(names(variable_recoder),
                                     names(level_recoder)))
 
-      if(!is_empty(leftovers)){
+      if(!is_empty(leftovers) && warn_unmatched){
         warning(
           "Unique values in x could not be matched with variable labels ",
           "or variable level labels in the dictionary. The x values that ",

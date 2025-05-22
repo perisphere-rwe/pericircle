@@ -20,8 +20,8 @@ recode_with_extras <- c("number", "integer", "extra_1", "extra_2")
 test_that("unaccounted unique values are listed in warnings", code = {
 
   expect_warning(dd$recode(recode_with_extras,
-                         extra_1 = "This extra is okay"),
-               regexp = "extra_2")
+                           extra_1 = "This extra is okay"),
+                 regexp = "extra_2")
 
 })
 
