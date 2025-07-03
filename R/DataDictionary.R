@@ -328,7 +328,7 @@ NominalVariable <- R6Class(
       self$check_category_labels(category_labels)
 
       self$category_levels <- category_levels
-      self$category_labels <- category_labels
+      self$category_labels <- category_labels %||% category_levels
 
     },
 

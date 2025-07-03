@@ -23,6 +23,10 @@ test_that("unaccounted unique values are listed in warnings", code = {
                            extra_1 = "This extra is okay"),
                  regexp = "extra_2")
 
+  expect_true("extra_2" %in% dd$recode(recode_with_extras,
+                                       extra_1 = "This extra is okay",
+                                       warn_unmatched = FALSE))
+
 })
 
 
@@ -37,7 +41,7 @@ test_that("unaccounted unique values can be recoded on the fly", code = {
 
 })
 
-test_that("each feature works together at the same time", code = {
+test_that("each recode feature works together at the same time", code = {
 
   expect_equal(
     dd$recode(recode_with_extras,

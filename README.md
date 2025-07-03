@@ -4,6 +4,7 @@
 # pericircle
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 A slice of Perisphere, `pericircle` aims to allow straightforward
@@ -53,8 +54,8 @@ dd_peng
 #> # A tibble: 5 × 7
 #>   name    label description units divby_modeling category_levels category_labels
 #>   <chr>   <chr> <chr>       <chr> <chr>          <chr>           <chr>          
-#> 1 species none  none        none  none           Adelie, Chinst… none           
-#> 2 sex     none  none        none  none           female, male    none           
+#> 1 species none  none        none  none           Adelie, Chinst… Adelie, Chinst…
+#> 2 sex     none  none        none  none           female, male    female, male   
 #> 3 body_m… none  none        none  none           none            none           
 #> 4 bill_l… none  none        none  none           none            none           
 #> 5 bill_d… none  none        none  none           none            none
@@ -72,25 +73,6 @@ text to them and ask for help filling in the gaps.
 
 ``` r
 get_unknowns(dd_peng, as_request = TRUE)
-#> Category labels for this variable (labels are shown in reports):
-#> 
-#>   - species: Adelie = ?;  Chinstrap = ?;  Gentoo = ?
-#>   - sex: female = ?;  male = ?
-#> 
-#> Optional: additional relevant details (e.g., method of collection or measurement):
-#> 
-#>   - species = ?
-#>   - sex = ?
-#>   - body_mass_g = ?
-#>   - bill_length_mm = ?
-#>   - bill_depth_mm = ?
-#> 
-#> Units for model output (e.g., per 10 years of age):
-#> 
-#>   - body_mass_g = ?
-#>   - bill_length_mm = ?
-#>   - bill_depth_mm = ?
-#> 
 #> A label to use for this variable in reports:
 #> 
 #>   - species = ?
@@ -98,6 +80,11 @@ get_unknowns(dd_peng, as_request = TRUE)
 #>   - body_mass_g = ?
 #>   - bill_length_mm = ?
 #>   - bill_depth_mm = ?
+#> 
+#> Category labels for this variable (labels are shown in reports):
+#> 
+#>   - species: Adelie = ?;  Chinstrap = ?;  Gentoo = ?
+#>   - sex: female = ?;  male = ?
 #> 
 #> Variable units (e.g., age in years):
 #> 
@@ -118,9 +105,6 @@ dd_peng <- dd_peng %>%
              sex = "Sex",
              bill_length_mm = "Bill length",
              bill_depth_mm = "Bill depth") %>% 
-  set_category_levels(species = c("Adelie", "Chinstrap", "Gentoo"),
-                      sex = c("male", "female")) %>% 
-  set_category_labels(sex = c("Male", "Female")) %>% 
   set_units(bill_length_mm = "mm",
             bill_depth_mm = "mm",
             body_mass_g = "grams") %>% 
@@ -129,11 +113,6 @@ dd_peng <- dd_peng %>%
 ```
 
 #### Modifying factors
-
-`set_category_levels()` and `set_category_labels()` are nice when you
-are creating a dictionary, but `set_factor_labels()` and
-`set_factor_order()` are the functions you want to use when modifying a
-dictionary.
 
 Modify factor labels, changing one or more labels in an existing
 variable, with `set_factor_labels()`:
@@ -145,8 +124,8 @@ dd_peng$variables$sex
 #>   Name               : sex 
 #>   Label              : Sex 
 #>   Description        : none 
-#>   Category Levels    : male, female 
-#>   Category Labels    : Male, Female
+#>   Category Levels    : female, male 
+#>   Category Labels    : female, male
 
 dd_peng <- dd_peng %>% 
   set_factor_labels(sex = c(female = "F", male = "M"))
@@ -156,8 +135,8 @@ dd_peng$variables$sex
 #>   Name               : sex 
 #>   Label              : Sex 
 #>   Description        : none 
-#>   Category Levels    : male, female 
-#>   Category Labels    : M, F
+#>   Category Levels    : female, male 
+#>   Category Labels    : F, M
 ```
 
 Modify factor order, moving one or more levels to the front, with
@@ -401,10 +380,20 @@ data_peng %>%
   summarize_each_group(mean_weight = mean(body_mass_g, na.rm = TRUE),
                        nobs = n()) %>% 
   mutate(.group_variable = dd_peng$recode(.group_variable))
-#> Error in `mutate()`:
+#> Warning: There was 1 warning in `mutate()`.
 #> ℹ In argument: `.group_variable = dd_peng$recode(.group_variable)`.
-#> Caused by error:
-#> ! Unique values in x could not be matched with variable labels or variable level labels in the dictionary. The x values that could not be matched are: .overall
+#> Caused by warning:
+#> ! Unique values in x could not be matched with variable labels or variable level labels in the dictionary. The x values that could not be matched are: .overall. To disable this warning, set `warn_unmatched = FALSE` in the call to `recode()`.
+#> # A tibble: 7 × 4
+#>   .group_variable .group_level mean_weight  nobs
+#>   <chr>           <chr>              <dbl> <int>
+#> 1 .overall        .overall           4202.   344
+#> 2 Species         Adelie             3701.   152
+#> 3 Species         Chinstrap          3733.    68
+#> 4 Species         Gentoo             5076.   124
+#> 5 Sex             female             3862.   165
+#> 6 Sex             male               4546.   168
+#> 7 Sex             <NA>               4006.    11
 ```
 
 The fix: add a label for the “.overall” group in the call to `recode`.

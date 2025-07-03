@@ -30,7 +30,7 @@
     Code
       as_data_dictionary(data.frame(a = 1, b = "cat")) %>% set_labels(a = "example",
         b = "categorical example") %>% set_units(a = "years") %>% set_descriptions(a = "A variable used for examples") %>%
-        set_category_labels(b = "A small lion")
+        set_factor_labels(b = c(cat = "A small lion"))
     Output
       Data Dictionary:
       # A tibble: 2 x 7

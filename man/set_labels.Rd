@@ -5,8 +5,6 @@
 \alias{set_descriptions}
 \alias{set_units}
 \alias{set_divby_modeling}
-\alias{set_category_levels}
-\alias{set_category_labels}
 \alias{set_factor_labels}
 \alias{set_factor_order}
 \title{Modify Data Dictionary Elements}
@@ -18,10 +16,6 @@ set_descriptions(dictionary, ...)
 set_units(dictionary, ...)
 
 set_divby_modeling(dictionary, ...)
-
-set_category_levels(dictionary, ...)
-
-set_category_labels(dictionary, ...)
 
 set_factor_labels(dictionary, ...)
 
@@ -51,7 +45,7 @@ dd <- as_data_dictionary(data.frame(a = 1, b = "cat")) \%>\%
  set_labels(a = "example", b = "categorical example") \%>\%
  set_units(a = "years") \%>\%
  set_descriptions(a = "A variable used for examples") \%>\%
- set_category_labels(b = "A small lion")
+ set_factor_labels(b = c("cat" = "A small lion"))
 
 dd
 

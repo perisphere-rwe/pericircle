@@ -73,9 +73,6 @@ dd_peng <- dd_peng %>%
              sex = "Sex",
              bill_length_mm = "Bill length",
              bill_depth_mm = "Bill depth") %>% 
-  set_category_levels(species = c("Adelie", "Chinstrap", "Gentoo"),
-                      sex = c("male", "female")) %>% 
-  set_category_labels(sex = c("Male", "Female")) %>% 
   set_units(bill_length_mm = "mm",
             bill_depth_mm = "mm",
             body_mass_g = "grams") %>% 
@@ -85,8 +82,6 @@ dd_peng <- dd_peng %>%
 ```
 
 #### Modifying factors
-
-`set_category_levels()` and `set_category_labels()` are nice when you are creating a dictionary, but `set_factor_labels()` and `set_factor_order()` are the functions you want to use when modifying a dictionary. 
 
 Modify factor labels, changing one or more labels in an existing variable, with `set_factor_labels()`:
 
@@ -111,8 +106,6 @@ dd_peng <- dd_peng %>%
 dd_peng$variables$sex
 
 ```
-
-
 
 ### Apply dictionary information
 
@@ -139,7 +132,7 @@ data_peng %>%
 
 ```
 
-*Warning*: I am still working out some edge cases in this method. Please don't hesitate to open an issue if it fails in unexpected ways. If needed, there is a less convenient but more reliable way to get recode information for specific parts of the dictionary:
+If needed, there is a less convenient but more transparent way to get recode information for specific parts of the dictionary:
 
 ```{r}
 
@@ -183,6 +176,8 @@ knitr::include_graphics('img/screen-regression_table.png')
 
 ## Analysis helpers
 
+In addition to dictionaries, `pericircle` provides several functions that are intended to simplify and streamline our analyses. 
+
 ### Summarize overall and in each group, separately.
 
 We often want to summarize results overall and in subgroups based on multiple grouping variables. The `dplyr::summarize` function is almost perfect for this, but it isn't designed to let you summarize overall and within multiple subgroups in one call. That's why we include `summarize_each_group` in `pericircle` - it lets you run `dplyr::summarize` in all the groups of interest, without duplicating code.
@@ -222,11 +217,13 @@ data_peng %>%
 
 ```
 
-### Help! `summarize_each_group` broke the data dictionary
+### Help! `summarize_each_group` upset my data dictionary
 
-Yes, `summarize_each_group` can throw off the `recode()` function in your data dictionary, but it's easy to fix. This issue occurs b/c `summarize_each_group` adds a row for the overall sample called ".overall", and this value doesn't have a corresponding label in the dictionary, so `recode()` throws a hard stop to tell you (it may just be a warning in the future). 
+Yes, `summarize_each_group` will make your dictionary's `recode()` function throw a warning at you, but this is intentional and it's easy to address. 
 
-```{r, error=TRUE}
+`summarize_each_group` adds a row for the overall sample called `".overall"`, and this value doesn't have a corresponding label in the dictionary. Naturally `recode()` alerts you to this unlabeled variable. 
+
+```{r}
 
 data_peng %>% 
   group_by(species, sex) %>% 
@@ -236,7 +233,7 @@ data_peng %>%
 
 ```
 
-The fix: add a label for the ".overall" group in the call to `recode`.
+The easiest fix is to add a label for the ".overall" group in the call to `recode`.
 
 ```{r}
 data_peng %>% 
@@ -246,4 +243,5 @@ data_peng %>%
   mutate(.group_variable = dd_peng$recode(.group_variable, 
                                           .overall = "Overall"))
 ```
+
 

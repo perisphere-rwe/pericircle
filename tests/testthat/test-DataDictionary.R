@@ -167,11 +167,11 @@ test_that(
     expect_error(set_divby_modeling(dd, factor = 'ohno'),
                  regexp = 'nominal variable')
 
-    expect_error(set_category_labels(dd, integer = 'ohno'),
-                 regexp = 'numeric variable')
+    expect_error(set_factor_labels(dd, integer = c('ohno'='ohnooo')),
+                 regexp = 'only nominal')
 
-    expect_error(set_category_levels(dd, number = 'ohno'),
-                 regexp = 'numeric variable')
+    expect_error(set_factor_order(dd, number = 'ohno'),
+                 regexp = 'only nominal')
 
 
     expect_error(DataDictionary$new(vars = list()), 'At least one variable')
@@ -221,7 +221,7 @@ test_that(
         set_labels(a = "example", b = "categorical example") %>%
         set_units(a = "years") %>%
         set_descriptions(a = "A variable used for examples") %>%
-        set_category_labels(b = "A small lion")
+        set_factor_labels(b = c(cat = "A small lion"))
 
     )
 

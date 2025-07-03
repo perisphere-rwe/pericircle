@@ -30,11 +30,16 @@
 #'   set_units(Sepal.Length = "cm") %>%
 #'   get_unknowns(as_request = TRUE)
 
-get_unknowns <- function(x, as_request = FALSE){
+get_unknowns <- function(x, as_request = FALSE, show_optional = FALSE){
 
   data_unknowns <- x$dictionary %>%
     dplyr::mutate(type = purrr::map_chr(x$variables, "type"), .after = 1) %>%
     dplyr::rename(variable = name) %>%
+    dplyr::mutate(
+      category_labels = dplyr::if_else(category_labels==category_levels,
+                                       true = 'none',
+                                       false = category_labels)
+    ) %>%
     tidyr::pivot_longer(cols = -c(variable, type)) %>%
     dplyr::filter(
       dplyr::case_when(
@@ -44,7 +49,18 @@ get_unknowns <- function(x, as_request = FALSE){
         type == "Nominal" ~ value == "none" & name %in% c("category_levels",
                                                           "category_labels")
       )
-    )
+    ) %>%
+    dplyr::mutate(name = factor(name,
+                                levels = c("label", "category_labels",
+                                           "units", "divby_modeling",
+                                           "description"))) %>%
+    dplyr::arrange(name)
+
+  if(!show_optional){
+    data_unknowns <- data_unknowns %>%
+      dplyr::filter(name %in% c("label", "units", "category_labels")) %>%
+      droplevels()
+  }
 
   if(!as_request) return(data_unknowns)
 
@@ -53,7 +69,7 @@ get_unknowns <- function(x, as_request = FALSE){
       .f = ~ {
 
         .x_name <- switch(
-          .x$name[1],
+          as.character(.x$name[1]),
           label = "A label to use for this variable in reports",
           description = paste(
             "Optional: additional relevant details",

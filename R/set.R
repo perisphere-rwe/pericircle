@@ -21,7 +21,7 @@
 #'  set_labels(a = "example", b = "categorical example") %>%
 #'  set_units(a = "years") %>%
 #'  set_descriptions(a = "A variable used for examples") %>%
-#'  set_category_labels(b = "A small lion")
+#'  set_factor_labels(b = c("cat" = "A small lion"))
 #'
 #' dd
 #'
@@ -58,23 +58,6 @@ set_divby_modeling <- function(dictionary, ...){
 
 #' @rdname set_labels
 #' @export
-set_category_levels <- function(dictionary, ...){
-  checkmate::assert_class(dictionary, "DataDictionary")
-  dictionary$modify_dictionary(list(...), field = 'category_levels')
-  dictionary
-}
-
-#' @rdname set_labels
-#' @export
-set_category_labels <- function(dictionary, ...){
-  checkmate::assert_class(dictionary, "DataDictionary")
-  dictionary$modify_dictionary(list(...), field = 'category_labels')
-  dictionary
-}
-
-
-#' @rdname set_labels
-#' @export
 set_factor_labels <- function(dictionary, ...){
   set_factors(dictionary, ..., .relevel = FALSE)
 }
@@ -97,6 +80,12 @@ set_factor_order <- function(dictionary, ...){
     checkmate::assert_choice(i,
                              .var.name = i,
                              choices = dictionary$get_variable_names())
+
+    # factors/characters only
+    if(dictionary$variables[[i]]$type == "Numeric"){
+      stop("only nominal variables can have factor levels modified:",
+           " '", i, "' is a numeric variable", call. = FALSE)
+    }
 
     if(!is.null(names(.dots[[i]]))){
       stop("Vector inputs to `set_factor_levels` must not be named.\n",
@@ -158,6 +147,12 @@ set_factors <- function(dictionary, ..., .relevel){
     checkmate::assert_choice(i,
                              .var.name = i,
                              choices = dictionary$get_variable_names())
+
+    # factors/characters only
+    if(dictionary$variables[[i]]$type == "Numeric"){
+      stop("only nominal variables can have factor levels modified:",
+           " '", i, "' is a numeric variable", call. = FALSE)
+    }
 
     # create input lists for eventual call to modify_dictionary
     input_lvls <- purrr::set_names(list(names(.dots[[i]])), i)
