@@ -214,10 +214,8 @@ data_peng %>%
 #> # ℹ 678 more rows
 ```
 
-*Warning*: I am still working out some edge cases in this method. Please
-don’t hesitate to open an issue if it fails in unexpected ways. If
-needed, there is a less convenient but more reliable way to get recode
-information for specific parts of the dictionary:
+If needed, there is a less convenient but more transparent way to get
+recode information for specific parts of the dictionary:
 
 ``` r
 
@@ -283,6 +281,9 @@ knitr::include_graphics('img/screen-regression_table.png')
 <img src="img/screen-regression_table.png" width="100%" />
 
 ## Analysis helpers
+
+In addition to dictionaries, `pericircle` provides several functions
+that are intended to simplify and streamline our analyses.
 
 ### Summarize overall and in each group, separately.
 
@@ -364,14 +365,15 @@ data_peng %>%
 #> 11 Gentoo    sex             <NA>               4588.     5
 ```
 
-### Help! `summarize_each_group` broke the data dictionary
+### Help! `summarize_each_group` upset my data dictionary
 
-Yes, `summarize_each_group` can throw off the `recode()` function in
-your data dictionary, but it’s easy to fix. This issue occurs b/c
+Yes, `summarize_each_group` will make your dictionary’s `recode()`
+function throw a warning at you, but this is intentional and it’s easy
+to address.
+
 `summarize_each_group` adds a row for the overall sample called
-“.overall”, and this value doesn’t have a corresponding label in the
-dictionary, so `recode()` throws a hard stop to tell you (it may just be
-a warning in the future).
+`".overall"`, and this value doesn’t have a corresponding label in the
+dictionary. Naturally `recode()` alerts you to this unlabeled variable.
 
 ``` r
 
@@ -396,7 +398,8 @@ data_peng %>%
 #> 7 Sex             <NA>               4006.    11
 ```
 
-The fix: add a label for the “.overall” group in the call to `recode`.
+The easiest fix is to add a label for the “.overall” group in the call
+to `recode`.
 
 ``` r
 data_peng %>% 

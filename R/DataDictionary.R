@@ -47,7 +47,8 @@ DataVariable <- R6Class(
       checkmate::assert_character(type, len = 1, any.missing = FALSE)
       checkmate::assert_choice(type, choices = c("Data",
                                                  "Numeric",
-                                                 "Nominal"))
+                                                 "Nominal",
+                                                 "Date"))
     },
 
     check_label = function(value) {
@@ -340,6 +341,73 @@ NominalVariable <- R6Class(
       cat("  Category Levels    :", self$fmt_category_levels(), "\n")
       cat("  Category Labels    :", self$fmt_category_labels(), "\n")
 
+    }
+  )
+)
+
+# DateVariable ----
+
+DateVariable <- R6Class(
+  "DateVariable",
+  inherit = DataVariable,
+
+  public = list(
+
+    # Optionally store a format string like "%Y-%m-%d"
+    date_format = NULL,
+
+    check_category_levels = function(value) {
+      if (!is.null(value)) stop("category_levels cannot be specified for a date variable.", call. = FALSE)
+    },
+
+    check_category_labels = function(value) {
+      if (!is.null(value)) stop("category_labels cannot be specified for a date variable.", call. = FALSE)
+    },
+
+    check_units = function(value) {
+      if (!is.null(value)) stop("units cannot be specified for a date variable.", call. = FALSE)
+    },
+
+    check_divby_modeling = function(value) {
+      if (!is.null(value)) stop("divby_modeling cannot be specified for a date variable.", call. = FALSE)
+    },
+
+    check_date_format = function(value) {
+      if (!is.null(value)) {
+        checkmate::assert_character(value, len = 1, any.missing = FALSE)
+      }
+    },
+
+    get_label_and_unit = function(sep = ', '){
+      self$fetch_label()
+    },
+
+    get_label_divby = function(){
+      self$fetch_label()
+    },
+
+    # Constructor
+    initialize = function(name,
+                          label = NULL,
+                          description = NULL,
+                          date_format = NULL) {
+
+      super$initialize(
+        name = name,
+        type = "Date",
+        label = label,
+        description = description
+      )
+
+      self$check_date_format(date_format)
+      self$date_format <- date_format
+    },
+
+    print = function(...) {
+      super$print(...)
+      if (!is.null(self$date_format)) {
+        cat("  Date Format        :", self$date_format, "\n")
+      }
     }
   )
 )
@@ -676,6 +744,16 @@ as_data_dictionary <- function(x){
         name = .y,
         label = attr(.x, 'label')
       ),
+      'POSIXct' = DateVariable$new(
+        name = .y,
+        label = attr(.x, 'label'),
+        date_format = attr(.x, 'date_format')
+      ),
+      'Date' = DateVariable$new(
+        name = .y,
+        label = attr(.x, 'label'),
+        date_format = attr(.x, 'date_format')
+      ),
       NULL
     )
   )
@@ -787,4 +865,23 @@ nominal_variable <- function(name,
                       category_levels = category_levels,
                       category_labels = category_labels)
 
+}
+
+#' Create a Date Variable
+#'
+#' @param name Variable name
+#' @param label Variable label
+#' @param description Optional description
+#' @param date_format Optional date format (e.g. "%Y-%m-%d")
+#'
+#' @return A `DateVariable` object.
+#' @export
+date_variable <- function(name,
+                          label = NULL,
+                          description = NULL,
+                          date_format = NULL) {
+  DateVariable$new(name = name,
+                   label = label,
+                   description = description,
+                   date_format = date_format)
 }

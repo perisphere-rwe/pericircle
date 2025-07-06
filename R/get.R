@@ -146,3 +146,23 @@ get_unknowns <- function(x, as_request = FALSE, show_optional = FALSE){
 get_dictionary <- function(x){
   x$dictionary
 }
+
+
+get_terms_key <- function(x, terms_sep = ""){
+
+  purrr::map(x$variables, ~.x$fetch_category_levels() %||% "..none..") %>%
+    tibble::enframe(name = 'variable', value = 'levels') %>%
+    tidyr::unnest(cols = levels) %>%
+    dplyr::mutate(
+      levels = dplyr::if_else(levels == '..none..',
+                              NA_character_,
+                              levels),
+      term = dplyr::if_else(is.na(levels),
+                            variable,
+                            paste(variable, levels, sep = terms_sep)),
+      .before = variable
+    )
+
+}
+
+
