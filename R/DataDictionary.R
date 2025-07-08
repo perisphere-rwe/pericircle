@@ -633,14 +633,14 @@ DataDictionary <- R6Class(
 
       throw_check(chk_inputs)
 
-      for(i in seq_along(names(key))){
+      unmatched_inputs <- setdiff(names(key), self$dictionary$name)
 
-        chk_i <- checkmate::check_choice(
-          x = names(key)[i],
-          choices = self$dictionary$name
-        )
+      if(!purrr::is_empty(unmatched_inputs)){
 
-        throw_check(chk_i, pre_text = "Input name not recognized. ")
+        stop("unrecognized input name(s): \n\n",
+             paste(paste("-", unmatched_inputs), collapse = "\n"),
+             "\n\nInputs must match names of variables in the dictionary.",
+             call. = FALSE)
 
       }
 

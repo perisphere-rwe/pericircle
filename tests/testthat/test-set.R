@@ -21,4 +21,13 @@ test_that(
   }
 )
 
+test_that(
+  desc = "tell me what variable is out of place",
+  code = {
+
+    expect_error(set_labels(dd, not_in_there = "tell me"),
+                 regexp = "Inputs must match")
+
+  }
+)
 
