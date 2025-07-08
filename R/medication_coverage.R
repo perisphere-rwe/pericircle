@@ -1,4 +1,16 @@
 
+#' todo - document
+#'
+#' @param dt todo
+#' @param max_carry todo
+#' @param id_col todo
+#' @param med_col todo
+#' @param fill_date_col todo
+#' @param supply_col todo
+#'
+#' @returns a `data.table`
+#' @export
+#'
 dt_add_coverage_dates <- function(dt,
                                   max_carry = Inf,
                                   id_col = "id",

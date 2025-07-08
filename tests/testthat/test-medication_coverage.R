@@ -19,7 +19,7 @@ test_case <- tibble::tibble(
                           0, 1, 6, 0)
 )
 
-dt <- select(test_case, ID:DAYS_SUPPLY)
+dt <- dplyr::select(test_case, ID:DAYS_SUPPLY)
 
 answer <- dt %>%
   dt_add_coverage_dates(
@@ -27,7 +27,7 @@ answer <- dt %>%
     med_col = "MEDICATION",
     fill_date_col = "DATE_FILL",
     supply_col = "DAYS_SUPPLY",
-    max_carry = 2
+    max_carry = Inf
   )
 
 smry <- answer[, .(start = start[1],
