@@ -4,7 +4,7 @@
 \alias{get_unknowns}
 \title{Get Unknown Fields in Dictionary}
 \usage{
-get_unknowns(x, as_request = FALSE)
+get_unknowns(x, as_request = FALSE, show_optional = FALSE)
 }
 \arguments{
 \item{x}{A \link[=data_dictionary]{data dictionary} object.}
