@@ -14,5 +14,5 @@
       Variable units (e.g., age in years):
       
         - number = ?
-        - integer = ?
+        - integer = ? 
 

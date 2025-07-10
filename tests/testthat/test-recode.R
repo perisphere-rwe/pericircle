@@ -54,3 +54,40 @@ test_that("each recode feature works together at the same time", code = {
 
 })
 
+test_that(
+  "recode throws warning w/explanation for duplicated labels",
+  code = {
+
+    dd <- data_dictionary(
+      nominal_variable('htn', 'hypertension', category_levels = c('no', 'yes')),
+      nominal_variable('diab', 'diabetes', category_levels = c('no', 'yes')),
+      nominal_variable('age', "age group", category_levels = c("first", "second")),
+      nominal_variable("bmi", "bmu group", category_levels = c("first", "second"))
+    ) %>%
+      set_factor_labels(htn = c(no = "Nope", 'yes' = 'hypertension'),
+                        diab = c(no = "Nope", 'yes' = 'diabetes'),
+                        age = c("first" = "50-65"),
+                        bmi = c("first" = "< 18"))
+
+    expect_warning(dd$recode(c("no", "yes", "first")),
+                   regexp = "multiple labels")
+
+    expect_equal(dd$recode("no"), "Nope")
+
+  }
+)
+
+test_that(
+  "recode is unphased by duplicated binary levels w/out diverging labels",
+  code = {
+
+    dd <- data_dictionary(
+      nominal_variable('htn', 'hypertension', category_levels = c('no', 'yes')),
+      nominal_variable('diab', 'diabetes', category_levels = c('no', 'yes'))
+    )
+
+    expect_equal(dd$recode(c("no", "yes")), c("no", "yes"))
+
+  }
+)
+

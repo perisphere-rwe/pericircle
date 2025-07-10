@@ -623,12 +623,47 @@ DataDictionary <- R6Class(
 
       if(any(x_in_variable_levels)){
 
-        if(any(duplicated(level_recoder))){
-          stop("there are duplicated levels in the data dictionary. ",
-               "This occurs when one or more variables have identical ",
-               "labels, and it prevents `recode()` from identifying ",
-               "which label to attach to the given x values.",
-               call. = FALSE)
+        # the names of level_recoder are levels
+        dup_levels <- duplicated(names(level_recoder))
+        # the values of level_recoder are labels
+        dup_labels <- duplicated(level_recoder)
+
+        # mapping the same level to multiple labels causes a problem.
+        # e.g., mapping level of "yes" to labels of X and Y? When should
+        # it map to X and when should it map to Y? We can't tell if
+        # we only see "yes"'s in the vector that we are trying to recode.
+
+        dup_problems <- names(level_recoder)[dup_levels] %>%
+          # mapping multiple levels to the same label is okay.
+          # e.g., mapping levels of X and Y to the label of "yes"? no problem.
+          # this step removed those.
+          setdiff(names(level_recoder)[dup_labels]) %>%
+          # this step makes it so we only throw warnings if the duplicates
+          # are actually in the input vector
+          intersect(x)
+
+        if(!purrr::is_empty(dup_problems)){
+
+          dups_explained <- dup_problems %>%
+            purrr::set_names() %>%
+            purrr::map(
+              ~ level_recoder[names(level_recoder) %in% .x] %>%
+                paste0("'", ., "'") %>%
+                paste(collapse = ' and ') %>%
+                paste0("The level '", .x, "' maps to labels of ", .)
+            )
+
+          msg <- paste0(
+            "One or more levels in the dictionary map to multiple labels:\n\n",
+            paste("-", paste(dups_explained), collapse = "\n"),
+            "\n\n`recode()` can only map a level to one label, ",
+            "so only the first label will be used.\n",
+            "This issue can be fixed by changing levels of nominal variables ",
+            "or by using recode vectors for each variable, separately."
+          )
+
+          warning(msg, call. = FALSE)
+
         }
 
       }
