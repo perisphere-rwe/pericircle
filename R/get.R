@@ -112,7 +112,7 @@ get_unknowns <- function(x, as_request = FALSE, show_optional = FALSE){
       }
     ) %>%
     paste(collapse = "\n\n") %>%
-    cat()
+    cat("\n")
 
 }
 

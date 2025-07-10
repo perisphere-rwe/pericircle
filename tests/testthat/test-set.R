@@ -31,3 +31,31 @@ test_that(
   }
 )
 
+test_that(
+  desc = "identifiers can be bare or quoted",
+  code = {
+
+    dd_1 <- copy(dd) %>%
+      set_identifiers("factor", character)
+
+    dd_2 <- copy(dd) %>%
+      set_identifiers(character, factor)
+
+    expect_equal(dd_1, dd_2)
+
+
+  }
+)
+
+test_that(
+  desc = "identifiers won't blow up the screen",
+  code = {
+
+    expect_snapshot(
+      set_identifiers(dd, character, factor) %>%
+        get_unknowns(as_request = TRUE)
+    )
+
+
+  }
+)

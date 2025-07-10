@@ -81,6 +81,33 @@ dd_peng <- dd_peng %>%
 
 ```
 
+#### Identifier variables
+
+An identifier variable uniquely defines sampling units in a data set. An identifier variable can cause disruption in a data dictionary if it is treated like a factor. For example, we don't want to supply labels for each level of an identifier, and we don't want to summarize data for each level of an identifier. To demonstrate the problem identifiers can pose, here's what would have happened in our call to `get_unknowns()` if we had an unmanaged identifier variable in the dictionary.
+
+```{r}
+
+data_peng %>% 
+  mutate(penguid_id = as.character(seq(n()))) %>% 
+  as_data_dictionary() %>% 
+  get_unknowns(as_request = TRUE)
+
+```
+
+The issue is that we don't want or need to supply category labels for `penguin_id`, so it isn't helpful for these to be included in our list of unknowns. The fix is to designate `penguin_id` (or generally any identifier variables) as an identifier variable, which should take care of all potential downstream issues.
+
+```{r}
+
+data_peng %>% 
+  mutate(penguin_id = as.character(seq(n()))) %>% 
+  as_data_dictionary() %>% 
+  set_identifiers(penguin_id) %>% 
+  get_unknowns(as_request = TRUE)
+
+```
+
+
+
 #### Modifying factors
 
 Modify factor labels, changing one or more labels in an existing variable, with `set_factor_labels()`:

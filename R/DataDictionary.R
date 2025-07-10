@@ -48,6 +48,7 @@ DataVariable <- R6Class(
       checkmate::assert_choice(type, choices = c("Data",
                                                  "Numeric",
                                                  "Nominal",
+                                                 "Identifier",
                                                  "Date"))
     },
 
@@ -412,6 +413,56 @@ DateVariable <- R6Class(
   )
 )
 
+# IdentifierVariable ----
+
+IdentifierVariable <- R6Class(
+  "IdentifierVariable",
+  inherit = DataVariable,
+
+  public = list(
+
+    check_category_levels = function(value) {
+      if (!is.null(value)) stop("category_levels cannot be specified for an identifier variable", call. = FALSE)
+    },
+
+    check_category_labels = function(value) {
+      if (!is.null(value)) stop("category_labels cannot be specified for an identifier variable", call. = FALSE)
+    },
+
+    check_units = function(value) {
+      if (!is.null(value)) stop("units cannot be specified for an identifier variable", call. = FALSE)
+    },
+
+    check_divby_modeling = function(value) {
+      if (!is.null(value)) stop("divby_modeling cannot be specified for an identifier variable", call. = FALSE)
+    },
+
+    get_label_and_unit = function(sep = ', ') {
+      self$fetch_label()
+    },
+
+    get_label_divby = function() {
+      self$fetch_label()
+    },
+
+    # Constructor
+    initialize = function(name, label = NULL, description = NULL) {
+
+      super$initialize(
+        name = name,
+        type = "Identifier",
+        label = label,
+        description = description
+      )
+    },
+
+    print = function(...) {
+      super$print(...)
+    }
+  )
+)
+
+
 # DataDictionary ----
 
 DataDictionary <- R6Class(
@@ -623,15 +674,7 @@ DataDictionary <- R6Class(
 
     },
 
-    modify_dictionary = function(key, field){
-
-      chk_inputs <-
-        checkmate::check_character(names(key),
-                                   any.missing = FALSE,
-                                   unique = TRUE,
-                                   null.ok = FALSE)
-
-      throw_check(chk_inputs)
+    check_inputs_match = function(key){
 
       unmatched_inputs <- setdiff(names(key), self$dictionary$name)
 
@@ -643,6 +686,38 @@ DataDictionary <- R6Class(
              call. = FALSE)
 
       }
+
+    },
+
+    check_inputs_unique = function(key){
+
+      duplicated_inputs <- table(names(key)) %>%
+        tibble::enframe() %>%
+        dplyr::mutate(value = as.numeric(value)) %>%
+        dplyr::filter(value > 1) %>%
+        dplyr::pull(name)
+
+      if(!purrr::is_empty(duplicated_inputs)){
+        warning("duplicated input name(s): \n\n",
+                paste(paste("-", duplicated_inputs), collapse = "\n"),
+                "\n\nInputs should only need to be specified once."
+        )
+      }
+
+    },
+
+    modify_dictionary = function(key, field){
+
+      chk_inputs <-
+        checkmate::check_character(names(key),
+                                   any.missing = FALSE,
+                                   unique = TRUE,
+                                   null.ok = FALSE)
+
+      throw_check(chk_inputs)
+
+      self$check_inputs_match(key)
+      self$check_inputs_unique(key)
 
       for(i in names(key)){
         self$variables[[i]]$set_element(field = field, value = key[[i]])
@@ -884,4 +959,18 @@ date_variable <- function(name,
                    label = label,
                    description = description,
                    date_format = date_format)
+}
+
+#' Create an Identifier Variable
+#'
+#' @param name Variable name
+#' @param label Variable label
+#' @param description Optional description
+#'
+#' @return A `DateVariable` object.
+#' @export
+identifier_variable <- function(name, label = NULL, description = NULL) {
+  IdentifierVariable$new(name = name,
+                         label = label,
+                         description = description)
 }

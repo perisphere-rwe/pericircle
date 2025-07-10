@@ -131,7 +131,8 @@ set_factor_order <- function(dictionary, ...){
 }
 
 
-
+#' @title Set Factors
+#' internal function used for factor modification
 set_factors <- function(dictionary, ..., .relevel){
 
   checkmate::assert_class(dictionary, "DataDictionary")
@@ -208,4 +209,51 @@ set_factors <- function(dictionary, ..., .relevel){
   dictionary
 
 }
+
+
+
+#' Set Identifier Variables
+#'
+#' @param dictionary `r roxy_describe_dd()`
+#' @param ... quoted or unquoted names of identifier variables
+#'
+#' @returns a modified `dictionary`
+#' @export
+#'
+set_identifiers <- function(dictionary, ...){
+
+  input_strings <- sapply(substitute(list(...)), deparse)[-1] %>%
+    stringr::str_remove_all("\"")
+
+  for(i in input_strings){
+
+    dictionary$variables[[i]] <-
+      identifier_variable(name = i,
+                          label = dictionary$variables[[i]]$label,
+                          description = dictionary$variables[[i]]$description)
+
+  }
+
+  dictionary$create_dictionary(dictionary$variables)
+
+  dictionary
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
