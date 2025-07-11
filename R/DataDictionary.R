@@ -834,38 +834,41 @@ as_data_dictionary <- function(x){
   vars <- purrr::map2(
     .x = x,
     .y = names(x),
-    .f = ~ switch(
-      class(.x)[1],
-      'factor' = NominalVariable$new(
-        name = .y,
-        label = attr(.x, 'label'),
-        category_levels = levels(.x)
-      ),
-      'character' = NominalVariable$new(
-        name = .y,
-        label = attr(.x, 'label'),
-        category_levels = unique(stats::na.omit(.x))
-      ),
-      'numeric' = NumericVariable$new(
-        name = .y,
-        label = attr(.x, 'label')
-      ),
-      'integer' = NumericVariable$new(
-        name = .y,
-        label = attr(.x, 'label')
-      ),
-      'POSIXct' = DateVariable$new(
-        name = .y,
-        label = attr(.x, 'label'),
-        date_format = attr(.x, 'date_format')
-      ),
-      'Date' = DateVariable$new(
-        name = .y,
-        label = attr(.x, 'label'),
-        date_format = attr(.x, 'date_format')
-      ),
+    .f = ~ {
+
+      if(inherits(.x, c('factor', 'character'))){
+        return(
+          NominalVariable$new(
+            name = .y,
+            label = attr(.x, 'label'),
+            category_levels = levels(.x) %||% unique(stats::na.omit(.x))
+          )
+        )
+      }
+
+      if(inherits(.x, c('numeric', 'integer'))){
+        return(
+          NumericVariable$new(
+            name = .y,
+            label = attr(.x, 'label')
+          )
+        )
+      }
+
+      if(inherits(.x, c('POSIXt', 'Date'))){
+        return(
+          DateVariable$new(
+            name = .y,
+            label = attr(.x, 'label'),
+            date_format = attr(.x, 'date_format')
+          )
+        )
+      }
+
       NULL
-    )
+
+    }
+
   )
 
   keep <- which(purrr::map_lgl(vars, ~!is.null(.x)))
