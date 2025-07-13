@@ -40,15 +40,17 @@
 #'
 #' bind_dictionary(dd_age_years, dd_age_group)
 
-bind_dictionary <- function(x, y, conflict_preference = NULL) {
+bind_dictionary <- function(x, y,
+                            conflict_preference = NULL,
+                            keep_unmatched_y = FALSE) {
 
   stopifnot(inherits(x, "DataDictionary"))
   stopifnot(inherits(y, "DataDictionary"))
 
-  vars1 <- x$variables
-  vars2 <- y$variables
+  vars_x <- x$variables
+  vars_y <- y$variables
 
-  dupes <- intersect(names(vars1), names(vars2))
+  dupes <- intersect(names(vars_x), names(vars_y))
 
   if (!purrr::is_empty(dupes) && is.null(conflict_preference)) {
     warning("Overlapping variable names in dictionaries:\n\n",
@@ -59,13 +61,21 @@ bind_dictionary <- function(x, y, conflict_preference = NULL) {
             call. = FALSE)
   }
 
+  vars_x_unmatched <- setdiff(names(vars_x), names(vars_y))
+  vars_y_unmatched <- setdiff(names(vars_y), names(vars_x))
+
   combined_vars <- switch(
     conflict_preference %||% "left",
-    left  = c(vars1, vars2[setdiff(names(vars2), names(vars1))]),
-    right = c(vars1[setdiff(names(vars1), names(vars2))], vars2),
-  ) %>%
-    # keep the order of the x dictionary,
-    .[c(names(vars1), setdiff(names(vars2), names(vars1)))]
+    left  = c(vars_x, vars_y[vars_y_unmatched]),
+    right = c(vars_x[vars_x_unmatched], vars_y),
+  )
+
+  # keep the order of the x dictionary
+  if(!keep_unmatched_y){ # drop unmatched y
+    combined_vars <- combined_vars[names(vars_x)]
+  } else { # retain unmatched y variables
+    combined_vars <- combined_vars[c(names(vars_x), vars_y_unmatched)]
+  }
 
   DataDictionary$new(combined_vars)
 

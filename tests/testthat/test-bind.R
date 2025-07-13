@@ -7,7 +7,8 @@ dd_2 <- as_data_dictionary(iris) %>%
   set_labels(Sepal.Length = "Label 2")
 
 dd_3 <- data_dictionary(
-  numeric_variable("Sepal.Length", "Label 3")
+  numeric_variable("Sepal.Length", "Label 3"),
+  numeric_variable("newboy")
 )
 
 test_that(
@@ -43,6 +44,16 @@ test_that(
         dplyr::slice(1) %>%
         dplyr::pull(label),
       c(Sepal.Length = "Label 3")
+    )
+
+    expect_equal(
+      bind_dictionary(dd_1, dd_3,
+                      conflict_preference = 'right',
+                      keep_unmatched_y = TRUE) %>%
+        getElement("dictionary") %>%
+        dplyr::filter(name == "newboy") %>%
+        dplyr::pull(name),
+      c(newboy = "newboy")
     )
 
   }
