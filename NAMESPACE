@@ -2,6 +2,7 @@
 
 export("%>%")
 export(as_data_dictionary)
+export(bind_dictionary)
 export(data_dictionary)
 export(date_variable)
 export(dt_add_coverage_dates)
