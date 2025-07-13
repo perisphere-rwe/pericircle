@@ -63,7 +63,9 @@ bind_dictionary <- function(x, y, conflict_preference = NULL) {
     conflict_preference %||% "left",
     left  = c(vars1, vars2[setdiff(names(vars2), names(vars1))]),
     right = c(vars1[setdiff(names(vars1), names(vars2))], vars2),
-  )
+  ) %>%
+    # keep the order of the x dictionary,
+    .[c(names(vars1), setdiff(names(vars2), names(vars1)))]
 
   DataDictionary$new(combined_vars)
 

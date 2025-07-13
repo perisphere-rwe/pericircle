@@ -6,6 +6,10 @@ dd_1 <- as_data_dictionary(iris) %>%
 dd_2 <- as_data_dictionary(iris) %>%
   set_labels(Sepal.Length = "Label 2")
 
+dd_3 <- data_dictionary(
+  numeric_variable("Sepal.Length", "Label 3")
+)
+
 test_that(
   desc = "Conflicts are warned about",
   code = {
@@ -31,6 +35,14 @@ test_that(
         dplyr::slice(1) %>%
         dplyr::pull(label),
       c(Sepal.Length = "Label 2")
+    )
+
+    expect_equal(
+      bind_dictionary(dd_1, dd_3, conflict_preference = 'right') %>%
+        getElement("dictionary") %>%
+        dplyr::slice(1) %>%
+        dplyr::pull(label),
+      c(Sepal.Length = "Label 3")
     )
 
   }
