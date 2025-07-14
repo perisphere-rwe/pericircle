@@ -30,6 +30,21 @@ data_test <- data.frame(
   date = as.POSIXct(Sys.time()+1:5)
 )
 
+test_that(
+  desc = "construction works from list or ..., not both",
+  code = {
+
+    dd_1 <-
+      data_dictionary(variable_list = list(age_years, age_group))
+
+    dd_2 <-
+      data_dictionary(age_years, age_group)
+
+    expect_equal(dd_1, dd_2)
+
+  }
+)
+
 dd <- as_data_dictionary(data_test)
 
 

@@ -4,7 +4,7 @@
 \alias{bind_dictionary}
 \title{Bind Dictionaries Together}
 \usage{
-bind_dictionary(x, y, conflict_preference = c("left", "right"))
+bind_dictionary(x, y, conflict_preference = NULL, keep_unmatched_y = FALSE)
 }
 \arguments{
 \item{x, y}{A \link[=data_dictionary]{data dictionary} object.}

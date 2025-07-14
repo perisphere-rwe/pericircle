@@ -783,8 +783,15 @@ DataDictionary <- R6Class(
 #' @param ... One or more objects inheriting from `r roxy_describe_numeric()`
 #'   or `r roxy_describe_nominal()`.
 #'
+#' @param variable_list A list of data variables. This argument allows
+#'  `data_dictionary` to be used programmatically and is optional. It is
+#'  intended to be used as an alternative to `...`.
+#'
 #' @return A `DataDictionary` object containing a tibble summary of all
 #'   variables.
+#'
+#' @details if both `...` and `variable_list` are specified, the dictionary
+#'   will only be created using `variable_list`.
 #'
 #' @export
 #'
@@ -806,9 +813,9 @@ DataDictionary <- R6Class(
 #' dd <- data_dictionary(age_years, gender)
 #' print(dd)
 #'
-data_dictionary <- function(...){
+data_dictionary <- function(..., variable_list = NULL){
 
-  DataDictionary$new(list(...))
+  DataDictionary$new(c(variable_list %||% list(...)))
 
 }
 
