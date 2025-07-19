@@ -4,7 +4,7 @@
 \alias{get_unknowns}
 \title{Get Unknown Fields in Dictionary}
 \usage{
-get_unknowns(x, as_request = FALSE, show_optional = FALSE)
+get_unknowns(x, as_request = FALSE, as_code = FALSE, show_optional = FALSE)
 }
 \arguments{
 \item{x}{A \link[=data_dictionary]{data dictionary} object.}
@@ -13,10 +13,15 @@ get_unknowns(x, as_request = FALSE, show_optional = FALSE)
 format that can be pasted into other settings, e.g., an e-mail
 requesting for the unknown information. If \code{FALSE} (the default),
 unknowns are returned as a \code{tibble}.}
+
+\item{as_code}{logical. If \code{TRUE}, text is returned as code that can
+be copy/pasted into an R script. If \code{FALSE} (the default),
+unknowns are returned as a \code{tibble}.}
 }
 \value{
-If \code{as_request = FALSE}, a \link[tibble:tibble-package]{tibble}.
-If \code{as_request = TRUE}, text is returned describing the unknowns.
+If \code{as_request = FALSE} and \code{as_code = FALSE},
+a \link[tibble:tibble-package]{tibble} is returned.
+If \code{as_request = TRUE} or \code{as_code = TRUE}, text is returned.
 }
 \description{
 Get Unknown Fields in Dictionary

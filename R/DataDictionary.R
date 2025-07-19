@@ -465,6 +465,10 @@ IdentifierVariable <- R6Class(
 
 # DataDictionary ----
 
+is_data_dictionary <- function(x){
+  inherits(x, "DataDictionary")
+}
+
 DataDictionary <- R6Class(
 
   "DataDictionary",
