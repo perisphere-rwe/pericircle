@@ -62,6 +62,13 @@ Our dictionary is initialized, but it doesn't contain complete information yet. 
 get_unknowns(dd_peng, as_request = TRUE)
 ```
 
+And if you want to get straight to filling these unknowns in using dictionary functions (described in the next section), `get_unknowns` gives you a full template to fill in when you specify `as_code = TRUE`:
+
+```{r}
+get_unknowns(dd_peng, as_code = TRUE)
+```
+
+
 ### Modify dictionary values
 
 Once we have this information ready to embed in the dictionary, we can use `pericircles` family of `set` functions:

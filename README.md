@@ -93,6 +93,27 @@ get_unknowns(dd_peng, as_request = TRUE)
 #>   - bill_depth_mm = ?
 ```
 
+And if you want to get straight to filling these unknowns in using
+dictionary functions (described in the next section), `get_unknowns`
+gives you a full template to fill in when you specify `as_code = TRUE`:
+
+``` r
+get_unknowns(dd_peng, as_code = TRUE)
+#> set_labels(species  = "",
+#>            sex  = "",
+#>            body_mass_g  = "",
+#>            bill_length_mm  = "",
+#>            bill_depth_mm  = "") %>% 
+#> set_factor_labels(species = c(Adelie = "",
+#>                               Chinstrap = "",
+#>                               Gentoo = ""),
+#>                   sex = c(female = "",
+#>                           male = "")) %>% 
+#> set_units(body_mass_g  = "",
+#>           bill_length_mm  = "",
+#>           bill_depth_mm  = "")
+```
+
 ### Modify dictionary values
 
 Once we have this information ready to embed in the dictionary, we can
