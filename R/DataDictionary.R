@@ -847,7 +847,7 @@ as_data_dictionary <- function(x){
     .y = names(x),
     .f = ~ {
 
-      if(inherits(.x, c('factor', 'character'))){
+      if(inherits(.x, c('factor', 'character', 'logical'))){
         return(
           NominalVariable$new(
             name = .y,
