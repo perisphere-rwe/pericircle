@@ -1,0 +1,23 @@
+Package: pericircle
+Title: Easily Install and Load Perisphere Packages
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Tyler", "Sagendorf", , "tsagendorf@perisphere-rwe.com", 
+           role = c("aut", "cre")),
+    person("Perisphere Real World Evidence, LLC", role = c("cph", "fnd"))
+  )
+Description: This package is designed to make it easy to install and load 
+    multiple packages used and developed by Perisphere Real World Evidence, LLC.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+BugReports: https://github.com/perisphere-rwe/pericircle/issues
+Depends:
+    R (>= 4.0.0)
+Imports:
+    pericircumference (>= 0.0.0.9000),
+    perinary (>= 0.0.0.9000)
+Remotes:
+    git::perisphere-rwe/pericircumference,
+    git::perisphere-rwe/perinary
