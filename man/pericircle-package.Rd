@@ -18,6 +18,11 @@ Useful links:
 \author{
 \strong{Maintainer}: Tyler Sagendorf \email{tsagendorf@perisphere-rwe.com}
 
+Authors:
+\itemize{
+  \item Byron Jaeger \email{bcjaeger@perisphere-rwe.com}
+}
+
 Other contributors:
 \itemize{
   \item Perisphere Real World Evidence, LLC [copyright holder, funder]
