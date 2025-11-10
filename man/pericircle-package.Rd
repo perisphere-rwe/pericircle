@@ -16,7 +16,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Tyler Sagendorf \email{tsagendorf@perisphere-rwe.com}
+\strong{Maintainer}: Byron Jaeger \email{bcjaeger@perisphere-rwe.com}
+
+Authors:
+\itemize{
+  \item Tyler Sagendorf \email{tsagendorf@perisphere-rwe.com}
+}
 
 Other contributors:
 \itemize{

@@ -1,9 +1,12 @@
 Package: pericircle
 Title: Easily Install and Load Perisphere Packages
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: c(
-    person("Tyler", "Sagendorf", , "tsagendorf@perisphere-rwe.com", 
+    person(given = "Byron", family = "Jaeger", 
+           email = "bcjaeger@perisphere-rwe.com", 
            role = c("aut", "cre")),
+    person(given = "Tyler", family = "Sagendorf", 
+           email = "tsagendorf@perisphere-rwe.com", role = "aut"),
     person("Perisphere Real World Evidence, LLC", role = c("cph", "fnd"))
   )
 Description: This package is designed to make it easy to install and load 
