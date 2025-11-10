@@ -28,14 +28,20 @@ pericircle_attach <- function() {
   )
 }
 
-# Attach message with version numbers of each pericircle package
+#' @title Attach message with version numbers of each pericircle package
+#'
+#' @param to_load character; one or more names of packages to load.
+#'
+#' @importFrom cli rule style_bold col_green col_blue symbol ansi_align ansi_nchar
+#'
+#' @noRd
 pericircle_attach_message <- function(to_load) {
   if (length(to_load) == 0) {
     return(NULL)
   }
 
-  header <- cli::rule(
-    left = cli::style_bold("Attaching core pericircle packages"),
+  header <- rule(
+    left = style_bold("Attaching core pericircle packages"),
     right = paste0("pericircle ", package_version_h("pericircle"))
   )
 
@@ -43,11 +49,11 @@ pericircle_attach_message <- function(to_load) {
   versions <- vapply(to_load, package_version_h, character(1))
 
   packages <- paste0(
-    cli::col_green(cli::symbol$tick),
+    col_green(symbol$tick),
     " ",
-    cli::col_blue(format(to_load)),
+    col_blue(format(to_load)),
     " ",
-    cli::ansi_align(versions, max(cli::ansi_nchar(versions)))
+    ansi_align(versions, max(ansi_nchar(versions)))
   )
 
   if (length(packages) %% 2 == 1) {
@@ -61,10 +67,12 @@ pericircle_attach_message <- function(to_load) {
   paste0(header, "\n", paste(info, collapse = "\n"))
 }
 
+#' @importFrom utils packageVersion
 package_version_h <- function(pkg) {
   highlight_version(utils::packageVersion(pkg))
 }
 
+#' @importFrom cli col_red
 highlight_version <- function(x) {
   x <- as.character(x)
 
@@ -74,6 +82,6 @@ highlight_version <- function(x) {
   }
 
   pieces <- strsplit(x, ".", fixed = TRUE)
-  pieces <- lapply(pieces, function(x) ifelse(is_dev(x), cli::col_red(x), x))
+  pieces <- lapply(pieces, function(x) ifelse(is_dev(x), col_red(x), x))
   vapply(pieces, paste, collapse = ".", FUN.VALUE = character(1))
 }

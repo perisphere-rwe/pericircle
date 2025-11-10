@@ -1,7 +1,8 @@
+#' @importFrom rlang inform
 inform_startup <- function(msg, ...) {
   if (is.null(msg)) {
     return()
   }
 
-  rlang::inform(msg, ..., class = "packageStartupMessage")
+  inform(msg, ..., class = "packageStartupMessage")
 }

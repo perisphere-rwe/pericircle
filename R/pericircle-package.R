@@ -1,5 +1,3 @@
-#' @import cli
-#' @import rlang
 #' @import pericircumference
 #' @import perinary
 #'
