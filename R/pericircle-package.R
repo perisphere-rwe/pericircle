@@ -1,3 +1,8 @@
+#' @import cli
+#' @import rlang
+#' @import pericircumference
+#' @import perinary
+#'
 #' @keywords internal
 "_PACKAGE"
 

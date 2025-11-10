@@ -19,8 +19,10 @@ BugReports: https://github.com/perisphere-rwe/pericircle/issues
 Depends:
     R (>= 4.0.0)
 Imports:
+    cli (>= 3.6.1),
     pericircumference (>= 0.0.0.9000),
-    perinary (>= 0.0.0.9000)
+    perinary (>= 0.0.0.9000),
+    rlang (>= 1.1.1)
 Remotes:
     git::perisphere-rwe/pericircumference,
     git::perisphere-rwe/perinary
