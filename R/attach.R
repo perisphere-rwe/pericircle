@@ -1,5 +1,7 @@
 # Code taken from https://github.com/tidyverse/tidyverse and modified
 core_packages <- c(
+  "peridefs",
+  "periglue",
   "pericircumference",
   "perinary"
 )
@@ -60,7 +62,7 @@ pericircle_attach_message <- function(to_load) {
     packages <- append(packages, "")
   }
 
-  ncols <- 1
+  ncols <- 2
   col1 <- seq_len(length(packages) / ncols)
   info <- paste0(packages[col1], "     ", packages[-col1])
 
