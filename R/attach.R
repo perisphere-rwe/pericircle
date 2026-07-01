@@ -3,7 +3,8 @@ core_packages <- c(
   "peridefs",
   "periglue",
   "pericircumference",
-  "perinary"
+  "perinary",
+  "peripal"
 )
 
 # Vector of core packages that are not attached

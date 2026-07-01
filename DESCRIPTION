@@ -25,9 +25,11 @@ Imports:
     periglue (>= 0.0.0.9000),
     pericircumference (>= 0.0.0.9000),
     perinary (>= 0.0.0.9000),
+    peripal (>= 0.0.0.9000),
     rlang (>= 1.1.1)
 Remotes:
     git::perisphere-rwe/peridefs,
     git::perisphere-rwe/periglue,
     git::perisphere-rwe/pericircumference,
-    git::perisphere-rwe/perinary
+    git::perisphere-rwe/perinary,
+    git::perisphere-rwe/peripal

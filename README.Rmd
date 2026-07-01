@@ -36,5 +36,8 @@ pak::pak("perisphere-rwe/pericircle")
 
 Then, `library(pericircle)` will attach the following packages:
 
+-   [peridefs](https://github.com/perisphere-rwe/peridefs)
+-   [periglue](https://github.com/perisphere-rwe/periglue)
 -   [pericircumference](https://github.com/perisphere-rwe/pericircumference)
 -   [perinary](https://github.com/perisphere-rwe/perinary)
+-   [peripal](https://github.com/perisphere-rwe/peripal)
