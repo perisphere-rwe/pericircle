@@ -28,8 +28,8 @@ Imports:
     peripal (>= 0.0.0.9000),
     rlang (>= 1.1.1)
 Remotes:
-    git::perisphere-rwe/peridefs,
-    git::perisphere-rwe/periglue,
-    git::perisphere-rwe/pericircumference,
-    git::perisphere-rwe/perinary,
-    git::perisphere-rwe/peripal
+    github::perisphere-rwe/peridefs,
+    github::perisphere-rwe/periglue,
+    github::perisphere-rwe/pericircumference,
+    github::perisphere-rwe/perinary,
+    github::perisphere-rwe/peripal
